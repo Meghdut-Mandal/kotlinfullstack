@@ -26,7 +26,7 @@ fun main() {
 }
 
 fun fetch(count: String): Unit {
-    val url = "http://localhost:8080/api/ping/$count"
+    val url = "${window.location.origin}/api/ping/$count"
     val req = XMLHttpRequest()
     req.onloadend = fun(event: Event){
         if (req.status.toInt() != 200) {
