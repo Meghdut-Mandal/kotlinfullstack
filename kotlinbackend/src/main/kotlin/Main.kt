@@ -36,10 +36,7 @@ fun Application.module() {
     install(DefaultHeaders)
 
     install(Routing) {
-        get("/") {
-            println(">>module  Recieved Request  ")
-            call.respondText("Hello, World!")
-        }
+
         get("/api/ping/{count?}") {
             println(">>module  Recieved Request  ")
 
