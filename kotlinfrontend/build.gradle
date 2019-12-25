@@ -34,6 +34,10 @@ compileKotlin2Js.kotlinOptions.outputFile = "${webDir}/js/app.js"
 compileKotlin2Js.kotlinOptions.suppressWarnings = true
 compileKotlin2Js.kotlinOptions.verbose = true
 
+build.doFirst {
+    delete "${webDir}"
+}
+
 build.doLast {
 //Copy kotlin library files to the web directory
 // Copy kotlin.js and kotlin-meta.js from jar into web directory
