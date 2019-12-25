@@ -1,0 +1,61 @@
+group 'com.alimuzaffar.demo'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.3.61'
+
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+
+    }
+}
+apply plugin: 'com.github.johnrengelman.shadow'
+
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+mainClassName = 'io.ktor.server.netty.EngineMain' // Starting with 1.0.0-beta-3
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+
+}
+
+dependencies {
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.3.61'
+    compile group: 'io.ktor', name: 'ktor-server-core', version: '1.3.0-rc'
+    compile group: 'io.ktor', name: 'ktor-server-jetty', version: '1.3.0-rc'
+    compile group: 'io.ktor', name: 'ktor-server-netty', version: '1.3.0-rc'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+shadowJar.doFirst {
+    delete fileTree(dir:"${projectDir.parentFile.absolutePath}", include: '**.jar')
+}
+shadowJar.doLast {
+    copy {
+        includeEmptyDirs = false
+        from "${buildDir}/libs"
+        into "${projectDir.parentFile.absolutePath}"
+    }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+shadowJar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
