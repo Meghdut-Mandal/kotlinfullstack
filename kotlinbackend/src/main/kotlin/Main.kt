@@ -19,7 +19,7 @@ import java.io.File
 
 fun main() {
     val port = Integer.valueOf(System.getenv("PORT"))
-
+    println(">>main  Runing on port $port ")
     embeddedServer(Netty, port, module = Application::module).start()
 }
 
@@ -32,6 +32,7 @@ fun Route.recursiveAdd(folder: File) {
         }
     }
 }
+
 fun Application.module() {
     install(DefaultHeaders)
 
