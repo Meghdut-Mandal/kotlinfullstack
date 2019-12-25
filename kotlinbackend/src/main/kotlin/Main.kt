@@ -32,8 +32,7 @@ fun Route.recursiveAdd(folder: File) {
 }
 fun Application.module() {
     install(DefaultHeaders)
-    install(CallLogging)
-    install(StatusPages)
+
     install(Routing) {
         get("/api/ping/{count?}") {
             println(">>main  pinged ")
