@@ -16,10 +16,9 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import java.io.File
 
+val port = Integer.valueOf(System.getenv("PORT"))
 
 fun main() {
-    val port = Integer.valueOf(System.getenv("PORT"))
-    println(">>main  Runing on port $port ")
     embeddedServer(Netty, port, module = Application::module).start()
 }
 
@@ -60,10 +59,10 @@ fun Application.module() {
         static("/") {
             val folder = File("${System.getProperty("user.dir")}/web")
             staticRootFolder = folder
+            println(">>main  Runing on port $port ")
             recursiveAdd(folder)
             file("index.html")
             default("index.html")
-
         }
 
     }
