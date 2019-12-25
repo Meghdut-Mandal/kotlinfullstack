@@ -18,7 +18,9 @@ import java.io.File
 
 
 fun main() {
-    embeddedServer(Netty, 8080, module = Application::module).start()
+    val port = Integer.valueOf(System.getenv("PORT"))
+
+    embeddedServer(Netty, port, module = Application::module).start()
 }
 
 fun Route.recursiveAdd(folder: File) {
