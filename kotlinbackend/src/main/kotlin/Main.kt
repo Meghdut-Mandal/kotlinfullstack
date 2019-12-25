@@ -34,6 +34,9 @@ fun Application.module() {
     install(DefaultHeaders)
 
     install(Routing) {
+        get("/") {
+            call.respondText("Hello, World!")
+        }
         get("/api/ping/{count?}") {
             println(">>main  pinged ")
             var count: Int = Integer.valueOf(call.parameters["count"] ?: "1")
