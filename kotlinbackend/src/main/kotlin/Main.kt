@@ -35,9 +35,12 @@ fun Application.module() {
 
     install(Routing) {
         get("/") {
+            println(">>module  Recieved Request  ")
             call.respondText("Hello, World!")
         }
         get("/api/ping/{count?}") {
+            println(">>module  Recieved Request  ")
+
             println(">>main  pinged ")
             var count: Int = Integer.valueOf(call.parameters["count"] ?: "1")
             if (count < 1) {
