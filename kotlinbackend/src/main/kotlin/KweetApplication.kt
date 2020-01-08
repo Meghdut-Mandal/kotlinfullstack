@@ -147,7 +147,13 @@ fun Application.mainWithDependencies(dao: ViveDao) {
     }
     install(StatusPages) {
         exception<Throwable> { cause ->
-            call.respondText { cause.localizedMessage }
+            cause.printStackTrace()
+            val errorMessage="""
+                Error !! 
+                Short Message :- $cause.localizedMessage
+                Stack Trace   :-${cause.stackTrace.joinToString(separator = "\n")}
+            """.trimIndent()
+            call.respondText { errorMessage }
         }
     }
     // This uses use the logger to log every call (request/response)
