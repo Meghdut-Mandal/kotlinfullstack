@@ -1,6 +1,6 @@
 <#import "template.ftl" as layout />
 
-<@layout.mainLayout title="New kweet">
+<@layout.mainLayout title="New Post">
 <form class="pure-form-stacked" action="/post-new" method="post" enctype="application/x-www-form-urlencoded">
     <input type="hidden" name="date" value="${date?c}">
     <input type="hidden" name="code" value="${code}">

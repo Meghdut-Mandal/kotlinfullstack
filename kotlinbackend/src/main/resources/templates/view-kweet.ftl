@@ -3,7 +3,7 @@
 <#-- @ftlvariable name="kweet" type="model.Kweet" -->
 <#import "template.ftl" as layout />
 
-<@layout.mainLayout title="New kweet">
+<@layout.mainLayout title="New Post">
 <section class="post">
     <header class="post-header">
         <p class="post-meta">
