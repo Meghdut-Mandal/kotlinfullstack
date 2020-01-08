@@ -1,5 +1,3 @@
-group 'com.alimuzaffar.demo'
-version '1.0-SNAPSHOT'
 
 buildscript {
     ext.kotlin_version = '1.3.61'
@@ -29,10 +27,10 @@ dependencies {
 }
 def webDir="${projectDir.parentFile.absolutePath}/web"
 
-compileKotlin2Js.kotlinOptions.sourceMap = true
+compileKotlin2Js.kotlinOptions.sourceMap = false
 compileKotlin2Js.kotlinOptions.outputFile = "${webDir}/js/app.js"
 compileKotlin2Js.kotlinOptions.suppressWarnings = true
-compileKotlin2Js.kotlinOptions.verbose = true
+compileKotlin2Js.kotlinOptions.verbose = false
 
 
 
