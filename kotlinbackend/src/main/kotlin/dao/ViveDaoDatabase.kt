@@ -21,7 +21,7 @@ interface ViveDao : Closeable {
      */
     fun getNotices(start: Int, limit: Int): List<Post>
 
-    fun insertNotice(post: Post)
+    fun insertNotice(post: Post): Long
     /*
     get the total number of notices
      */
@@ -43,7 +43,7 @@ interface ViveDao : Closeable {
      * Creates a Kweet from a specific [user] name, the kweet [text] content,
      * an optional [replyTo] id of the parent kweet, and a [date] that would default to the current time.
      */
-    fun createKweet(user: String, text: String, replyTo: Int? = null, date: DateTime = DateTime.now()): Int
+    fun createKweet(user: String, text: String, replyTo: Int? = null, date: DateTime = DateTime.now()): Long
 
     /**
      * Deletes a kweet from its [id].
@@ -53,12 +53,12 @@ interface ViveDao : Closeable {
     /**
      * Get the DAO object representation of a kweet based from its [id].
      */
-    fun getKweet(id: Int): Kweet
+    fun getKweet(id: Long): Kweet
 
     /**
      * Obtains a list of integral ids of kweets from a specific user identified by its [userId].
      */
-    fun userKweets(userId: String): List<Int>
+    fun userKweets(userId: String): List<Long>
 
     /**
      * Tries to get an user from its [userId] and optionally its password [hash].
@@ -82,12 +82,12 @@ interface ViveDao : Closeable {
     /**
      * Returns a list of Kweet ids, with the ones with most replies first.
      */
-    fun top(count: Int = 10): List<Int>
+    fun top(count: Int = 10): List<Long>
 
     /**
      * Returns a list of Keet ids, with the recent ones first.
      */
-    fun latest(count: Int = 10): List<Int>
+    fun latest(count: Int = 10): List<Long>
 }
 
 
@@ -97,17 +97,25 @@ class DAONitrateDataBase(val dbFile: File) : ViveDao {
     val userRepo = db.getRepository(User::class.java)
     val postRepo = db.getRepository(Post::class.java)
 
+
     override fun getNotices(start: Int, limit: Int): List<Post> {
-        return postRepo.find().drop(start).subList(0, limit)
+        val noticeCount = getNoticeCount()
+        return when {
+            noticeCount < start -> arrayListOf()
+            noticeCount < start + limit -> postRepo.find().drop(start).subList(0, noticeCount - start)
+            else -> postRepo.find().drop(start).subList(0, limit)
+        }
+
     }
 
-    override fun insertNotice(post: Post) {
-
-        postRepo.insert(post.copy(id=System.currentTimeMillis()))
+    override fun insertNotice(post: Post): Long {
+        val id = System.currentTimeMillis()
+        postRepo.insert(post.copy(id = id))
+        return id
     }
 
     override fun getNoticeCount(): Int {
-        return postRepo.find().count()
+        return postRepo.find().idSet().size
     }
 
     override fun init() {
@@ -117,8 +125,8 @@ class DAONitrateDataBase(val dbFile: File) : ViveDao {
         return tweetRepo.find().filter { it.replyTo == id }.count()
     }
 
-    override fun createKweet(user: String, text: String, replyTo: Int?, date: DateTime): Int {
-        val id = Random.nextInt(0, 30000)
+    override fun createKweet(user: String, text: String, replyTo: Int?, date: DateTime): Long {
+        val id = Random.nextLong(0, 30000)
         tweetRepo.insert(Kweet(id, user, text, (date).toString(), replyTo))
         db.commit()
         return id;
@@ -128,11 +136,11 @@ class DAONitrateDataBase(val dbFile: File) : ViveDao {
         tweetRepo.remove(Kweet::id eq id)
     }
 
-    override fun getKweet(id: Int): Kweet {
-        return tweetRepo.find(Kweet::id eq id).firstOrDefault()
+    override fun getKweet(id: Long): Kweet {
+        return tweetRepo.find(Kweet::id eq id).firstOrDefault() ?:Kweet(id,"none","none","noed",12)
     }
 
-    override fun userKweets(userId: String): List<Int> {
+    override fun userKweets(userId: String): List<Long> {
         return tweetRepo.find().filter { it.userId == userId }.map { it.id }.toList()
     }
 
@@ -149,11 +157,11 @@ class DAONitrateDataBase(val dbFile: File) : ViveDao {
         db.commit()
     }
 
-    override fun top(count: Int): List<Int> {
-        return tweetRepo.find().map { it.id }.toList()
+    override fun top(count: Int): List<Long> {
+        return getNotices(0,10).map { it.id }.toList()
     }
 
-    override fun latest(count: Int): List<Int> {
+    override fun latest(count: Int): List<Long> {
         return top(10)
     }
 

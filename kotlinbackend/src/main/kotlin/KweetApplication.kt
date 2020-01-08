@@ -121,7 +121,7 @@ fun Application.main() {
 
 fun Application.mainWithDependencies(dao: ViveDao) {
     if (dao.getNoticeCount() == 0) {
-        (1..12).map {
+        (1..120).map {
             Post(
                     Random.nextInt(200).toLong(),
                     12,

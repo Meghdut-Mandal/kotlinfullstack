@@ -13,7 +13,7 @@ data class PostResponse(
         @SerializedName("postList")
         val postList:List<Post>
 )
-
+data class PostMakeResponse(val id:Long, val status: String)
 data class Post(
         @SerializedName("postId")
         val id:Long,

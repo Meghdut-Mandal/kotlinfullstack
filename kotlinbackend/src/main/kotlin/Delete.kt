@@ -21,7 +21,7 @@ fun Route.delete(dao: ViveDao, hashFunction: (String) -> String) {
         val id = it.id.toString()
         val date = post["date"]?.toLongOrNull() ?: return@post call.redirect(ViewKweet(id))
         val code = post["code"] ?: return@post call.redirect(ViewKweet(id))
-        val kweet = dao.getKweet(id.toInt())
+        val kweet = dao.getKweet(id.toLong())
 
         // Verifies that the kweet user matches the session user and that the code and the date matches, to prevent CSFR.
         if (user == null || kweet.userId != user.userId || !call.verifyCode(date, user, code, hashFunction)) {
