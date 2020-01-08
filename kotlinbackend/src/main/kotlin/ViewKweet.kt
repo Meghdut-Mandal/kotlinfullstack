@@ -19,7 +19,8 @@ fun Route.viewKweet(dao: ViveDao, hashFunction: (String) -> String) {
         val date = System.currentTimeMillis()
         val code = if (user != null) call.securityCode(date, user, hashFunction) else null
 
-        val kweet = dao.getKweet(it.id)
+        val id = it.id.replace(",","").toInt()
+        val kweet = dao.getKweet(id)
         call.respond(FreeMarkerContent("view-kweet.ftl", mapOf("user" to user, "kweet" to kweet, "date" to date, "code" to code), user?.userId ?: ""))
     }
 }

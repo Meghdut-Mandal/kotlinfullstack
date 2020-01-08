@@ -18,15 +18,16 @@ fun Route.delete(dao: ViveDao, hashFunction: (String) -> String) {
         // Receives the Parameters date and code, if any of those fails to be obtained,
         // it redirects to the tweet page without deleting the kweet.
         val post = call.receive<Parameters>()
-        val date = post["date"]?.toLongOrNull() ?: return@post call.redirect(ViewKweet(it.id))
-        val code = post["code"] ?: return@post call.redirect(ViewKweet(it.id))
-        val kweet = dao.getKweet(it.id)
+        val id = it.id.toString()
+        val date = post["date"]?.toLongOrNull() ?: return@post call.redirect(ViewKweet(id))
+        val code = post["code"] ?: return@post call.redirect(ViewKweet(id))
+        val kweet = dao.getKweet(id.toInt())
 
         // Verifies that the kweet user matches the session user and that the code and the date matches, to prevent CSFR.
         if (user == null || kweet.userId != user.userId || !call.verifyCode(date, user, code, hashFunction)) {
-            call.redirect(ViewKweet(it.id))
+            call.redirect(ViewKweet(id))
         } else {
-            dao.deleteKweet(it.id)
+            dao.deleteKweet(id.toInt())
             call.redirect(Index())
         }
     }

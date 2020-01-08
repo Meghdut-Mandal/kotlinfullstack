@@ -47,7 +47,7 @@ fun Route.postNew(dao: ViveDao, hashFunction: (String) -> String) {
             call.redirect(Login())
         } else {
             val id = dao.createKweet(user.userId, text, null)
-            call.redirect(ViewKweet(id))
+            call.redirect(ViewKweet(id.toString()))
         }
     }
 }

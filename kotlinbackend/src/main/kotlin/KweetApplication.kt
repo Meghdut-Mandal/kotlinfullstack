@@ -42,7 +42,7 @@ class PostNew
 class KweetDelete(val id: Int)
 
 @Location("/view_kweet/{id}")
-data class ViewKweet(val id: Int)
+data class ViewKweet(val id: String)
 
 @Location("/user/{user}")
 data class UserPage(val user: String)
@@ -60,7 +60,7 @@ class Logout
 class SignUp
 
 @Location("/school/notices")
-data class Notices(val start:Int=0)
+data class Notices(val start: Int = 0)
 
 
 /**
@@ -93,7 +93,7 @@ val hmacKey = SecretKeySpec(hashKey, "HmacSHA1")
  * for storing the database.
  */
 val dao: ViveDao = DAONitrateDataBase(File("data.db"))
-        //DAOFacadeCache(DAOFacadeDatabase(Database.connect(pool)), File(dir.parentFile, "ehcache"))
+//DAOFacadeCache(DAOFacadeDatabase(Database.connect(pool)), File(dir.parentFile, "ehcache"))
 
 /**
  * Entry Point of the application. This function is referenced in the
@@ -103,17 +103,6 @@ val dao: ViveDao = DAONitrateDataBase(File("data.db"))
  */
 fun main() {
 
-    (1..12).map { Post(
-            Random.nextInt(200).toLong(),
-            12,
-            "Patna,Bihar",
-            "Tomorrow the school will be closed ",
-            "2W",
-            "https://randomuser.me/api/portraits/med/men/75.jpg",
-            "Vivek Kr Yadav"
-    ) }.forEach {
-        dao.insertNotice(it)
-    }
 
     embeddedServer(Netty, port, module = Application::main).start()
 }
@@ -129,18 +118,23 @@ fun Application.main() {
     mainWithDependencies(dao)
 }
 
-/**
- * This function is called from the entry point and tests to configure an application
- * using the specified [dao] [ViveDao].
- */
-class RedirectException(val path: String, val permanent: Boolean) : Exception()
 
-fun StatusPages.Configuration.registerRedirections() {
-    exception<RedirectException> { cause ->
-        call.respondRedirect(cause.path, cause.permanent)
-    }
-}
 fun Application.mainWithDependencies(dao: ViveDao) {
+    if (dao.getNoticeCount() == 0) {
+        (1..12).map {
+            Post(
+                    Random.nextInt(200).toLong(),
+                    12,
+                    "Patna,Bihar",
+                    "Tomorrow the school will be closed ",
+                    "2W",
+                    "https://randomuser.me/api/portraits/med/men/75.jpg",
+                    "Vivek Kr Yadav"
+            )
+        }.forEach {
+            dao.insertNotice(it)
+        }
+    }
     // This adds automatically Date and Server headers to each response, and would allow you to configure
     // additional headers served to each response.
     install(DefaultHeaders)
@@ -150,6 +144,11 @@ fun Application.mainWithDependencies(dao: ViveDao) {
             suffix = ".html"
             characterEncoding = "utf-8"
         })
+    }
+    install(StatusPages) {
+        exception<Throwable> { cause ->
+            call.respondText { cause.localizedMessage }
+        }
     }
     // This uses use the logger to log every call (request/response)
     install(CallLogging)
