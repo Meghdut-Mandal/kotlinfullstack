@@ -10,6 +10,8 @@
     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
     <link rel="stylesheet" type="text/css" href="/styles/main.css">
+
+
 </head>
 <body>
 <div class="pure-g">

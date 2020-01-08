@@ -14,7 +14,7 @@
 </section>
 <#if user??>
 <p>
-    <a href="javascript:void(0)" onclick="document.getElementById('deleteForm').submit()">Delete kweet</a>
+    <a href="javascript:void(0)" onclick="document.getElementById('deleteForm').submit()">Delete Post</a>
 </p>
 
 <form id="deleteForm" method="post" action="/kweet/${kweet.id}/delete" enctype="application/x-www-form-urlencoded">
