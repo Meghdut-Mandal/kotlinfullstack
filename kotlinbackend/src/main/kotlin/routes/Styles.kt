@@ -1,7 +1,7 @@
+package routes
+
 import io.ktor.application.call
-import io.ktor.http.content.files
 import io.ktor.http.content.resolveResource
-import io.ktor.http.content.static
 import io.ktor.locations.Location
 import io.ktor.locations.get
 import io.ktor.response.respond

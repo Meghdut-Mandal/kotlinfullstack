@@ -1,3 +1,10 @@
+package routes
+
+import Index
+import KweetSession
+import Login
+import Logout
+import UserPage
 import dao.ViveDao
 import io.ktor.application.*
 import io.ktor.freemarker.*
@@ -7,6 +14,8 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
+import redirect
+import userNameValid
 
 /**
  * Registers the [Login] and [Logout] routes '/login' and '/logout'.

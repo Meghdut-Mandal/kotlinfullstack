@@ -1,29 +1,39 @@
-import dao.ViveDao
 import dao.DAONitrateDataBase
-import freemarker.cache.*
-import io.ktor.application.*
+import dao.ViveDao
+import freemarker.cache.ClassTemplateLoader
+import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.application.install
 import io.ktor.features.*
-import io.ktor.freemarker.*
+import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.http.HttpHeaders
+import io.ktor.locations.Location
+import io.ktor.locations.Locations
+import io.ktor.locations.locations
+import io.ktor.request.header
+import io.ktor.request.host
+import io.ktor.request.port
+import io.ktor.response.respondRedirect
+import io.ktor.response.respondText
+import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.sessions.*
+import io.ktor.sessions.SessionTransportTransformerMessageAuthentication
+import io.ktor.sessions.Sessions
+import io.ktor.sessions.cookie
 import io.ktor.thymeleaf.Thymeleaf
-import io.ktor.util.*
+import io.ktor.util.hex
 import model.User
-import org.h2.*
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
-import java.io.*
-import java.net.*
+import routes.*
+import java.io.File
+import java.net.URI
 import java.text.DateFormat
-import java.util.concurrent.*
-import javax.crypto.*
-import javax.crypto.spec.*
+import java.util.concurrent.TimeUnit
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 import kotlin.random.Random
 
 
@@ -92,7 +102,7 @@ val hmacKey = SecretKeySpec(hashKey, "HmacSHA1")
  * Constructs a facade with the database, connected to the DataSource configured earlier with the [dir]
  * for storing the database.
  */
-val dao: ViveDao = DAONitrateDataBase(File("data.db"))
+val dao: ViveDao = DAONitrateDataBase(File("data/data.db"))
 //DAOFacadeCache(DAOFacadeDatabase(Database.connect(pool)), File(dir.parentFile, "ehcache"))
 
 /**

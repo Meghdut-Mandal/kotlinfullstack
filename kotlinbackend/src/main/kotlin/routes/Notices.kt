@@ -1,3 +1,9 @@
+package routes
+
+import Notices
+import Post
+import PostMakeResponse
+import PostResponse
 import dao.ViveDao
 import io.ktor.application.call
 import io.ktor.locations.get
@@ -18,6 +24,6 @@ fun Route.notices(dao: ViveDao, hashFunction: (String) -> String) {
     post<Notices> {
         val receive = call.receive<Post>()
         val id = dao.insertNotice(receive)
-        call.respond(PostMakeResponse(id,"success"))
+        call.respond(PostMakeResponse(id, "success"))
     }
 }

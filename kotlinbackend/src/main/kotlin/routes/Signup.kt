@@ -1,3 +1,6 @@
+package routes
+
+import SignUp
 import dao.ViveDao
 import io.ktor.application.call
 import io.ktor.locations.get

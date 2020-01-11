@@ -1,3 +1,8 @@
+package routes
+
+import KweetSession
+import Register
+import UserPage
 import dao.ViveDao
 import io.ktor.application.*
 import io.ktor.freemarker.*
@@ -8,6 +13,8 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
 import model.User
+import redirect
+import userNameValid
 
 /**
  * Register routes for user registration in the [Register] route (/register)
