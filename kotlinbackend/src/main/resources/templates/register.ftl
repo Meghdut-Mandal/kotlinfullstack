@@ -14,9 +14,15 @@
     </label>
 
 
+    <label for="phoneNumber">Phone Number
+        <input type="text" name="phoneNumber" id="phoneNumber"  value="${pageUser.phoneNumber}">
+    </label>
+
+
     <label for="email">Mail
         <input type="email" name="email" id="email" value="${pageUser.email}">
     </label>
+
 
 
     <label for="displayName">Display name
@@ -27,6 +33,7 @@
     <label for="password">Password
         <input type="password" name="password" id="password">
     </label>
+
 
 
     <input class="pure-button pure-button-primary" type="submit" value="Register">

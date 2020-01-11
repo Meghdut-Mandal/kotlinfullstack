@@ -58,7 +58,7 @@ data class ViewKweet(val id: String)
 data class UserPage(val user: String)
 
 @Location("/register")
-data class Register(val userId: String = "", val displayName: String = "", val email: String = "", val error: String = "")
+data class Register(val userId: String = "", val displayName: String = "", val email: String = "", val error: String = "", val phoneNumber: String = "")
 
 @Location("/login")
 data class Login(val userId: String = "", val error: String = "")
@@ -158,7 +158,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
     install(StatusPages) {
         exception<Throwable> { cause ->
             cause.printStackTrace()
-            val errorMessage="""
+            val errorMessage = """
                 Error !! 
                 Short Message :- $cause.localizedMessage
                 Stack Trace   :-${cause.stackTrace.joinToString(separator = "\n")}

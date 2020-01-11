@@ -42,6 +42,7 @@ fun Route.register(dao: ViveDao, hashFunction: (String) -> String) {
         val password = registration["password"] ?: return@post call.redirect(it)
         val displayName = registration["displayName"] ?: return@post call.redirect(it)
         val email = registration["email"] ?: return@post call.redirect(it)
+        val phone=registration["phoneNumber"] ?: return@post call.redirect(it)
 
         // prepare location class for error if any
         val error = Register(userId, displayName, email)
@@ -53,7 +54,7 @@ fun Route.register(dao: ViveDao, hashFunction: (String) -> String) {
             dao.user(userId) != null -> call.redirect(error.copy(error = "User with the following login is already registered"))
             else -> {
                 val hash = hashFunction(password)
-                val newUser = User(userId, email, displayName, hash)
+                val newUser = User(userId, email, displayName, hash,phone)
 
                 try {
                     dao.createUser(newUser)
@@ -84,7 +85,7 @@ fun Route.register(dao: ViveDao, hashFunction: (String) -> String) {
         if (user != null) {
             call.redirect(UserPage(user.userId))
         } else {
-            call.respond(FreeMarkerContent("register.ftl", mapOf("pageUser" to User(it.userId, it.email, it.displayName, ""), "error" to it.error), ""))
+            call.respond(FreeMarkerContent("register.ftl", mapOf("pageUser" to User(it.userId, it.email, it.displayName, "",it.phoneNumber), "error" to it.error), ""))
         }
     }
 }
