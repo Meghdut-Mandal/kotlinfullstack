@@ -20,6 +20,8 @@
             <nav class="nav">
                 <ul class="nav-list">
                     <li class="nav-item"><a class="pure-button" href="/">homepage</a></li>
+                    <li class="nav-item"><a class="pure-button" href="/school/list/0">Schools</a></li>
+
                     <#if user??>
                         <li class="nav-item"><a class="pure-button" href="/user/${user.userId}">my timeline</a></li>
                         <li class="nav-item"><a class="pure-button" href="/post-new">New Post</a></li>

@@ -1,4 +1,5 @@
 import dao.DAONitrateDataBase
+import dao.SchoolListDAO
 import dao.ViveDao
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
@@ -72,6 +73,11 @@ class SignUp
 @Location("/school/notices")
 data class Notices(val start: Int = 0)
 
+@Location("/school/list/{offset}")
+data class SchoolsList(val offset: Int = 0)
+
+
+
 
 /**
  * Represents a session in this site containing the userId.
@@ -103,6 +109,7 @@ val hmacKey = SecretKeySpec(hashKey, "HmacSHA1")
  * for storing the database.
  */
 val dao: ViveDao = DAONitrateDataBase(File("data/data.db"))
+val schoolsDao = SchoolListDAO(File("data/edugorrilas.db"))
 //DAOFacadeCache(DAOFacadeDatabase(Database.connect(pool)), File(dir.parentFile, "ehcache"))
 
 /**
@@ -216,6 +223,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         register(dao, hashFunction)
         signUp(dao, hashFunction)
         notices(dao, hashFunction)
+        schoolList(schoolsDao)
     }
 }
 
