@@ -103,8 +103,8 @@ val dao: ViveDao = DAONitrateDataBase(File("data.db"))
  */
 fun main() {
 
-
     embeddedServer(Netty, port, module = Application::main).start()
+    println(">>main  Running at http://localhost:$port/ ")
 }
 
 fun Application.main() {

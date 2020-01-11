@@ -158,7 +158,7 @@ class DAONitrateDataBase(val dbFile: File) : ViveDao {
     }
 
     override fun top(count: Int): List<Long> {
-        return getNotices(0,10).map { it.id }.toList()
+        return tweetRepo.find().map { it.id }
     }
 
     override fun latest(count: Int): List<Long> {

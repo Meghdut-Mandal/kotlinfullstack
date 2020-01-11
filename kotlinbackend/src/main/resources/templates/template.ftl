@@ -7,8 +7,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
     <title>${title} | Post</title>
-    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
-    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/grids-responsive-min.css">
+
     <link rel="stylesheet" type="text/css" href="/styles/main.css">
 </head>
 <body>
