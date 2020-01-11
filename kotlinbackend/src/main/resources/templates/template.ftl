@@ -6,18 +6,16 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-
-
-    <title>${title} | Posts</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-
-
+    <title>${title} | Post</title>
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
+    <link rel="stylesheet" type="text/css" href="/styles/main.css">
 </head>
 <body>
 <div class="pure-g">
     <div class="sidebar pure-u-1 pure-u-md-1-4">
         <div class="header">
-            <div class="brand-title">Vive Edusoft</div>
+            <div class="brand-title">Post</div>
             <nav class="nav">
                 <ul class="nav-list">
                     <li class="nav-item"><a class="pure-button" href="/">homepage</a></li>
@@ -52,7 +50,7 @@
 <section class="post">
     <header class="post-header">
         <p class="post-meta">
-            <a href="/view_kweet/${kweet.id}">${kweet.date}</a>
+            <a href="/kweet/${kweet.id}">${kweet.date}</a>
             by <a href="/user/${kweet.userId}">${kweet.userId}</a></p>
     </header>
     <div class="post-description">${kweet.text}</div>
@@ -64,7 +62,7 @@
     <#list kweets as kweet>
         <@kweet_li kweet=kweet></@kweet_li>
     <#else>
-        <li>There are no Posts yet</li>
+        <li>There are no post yet</li>
     </#list>
 </ul>
 </#macro>

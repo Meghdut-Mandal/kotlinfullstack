@@ -1,8 +1,11 @@
-import io.ktor.application.*
-import io.ktor.http.content.*
-import io.ktor.locations.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.application.call
+import io.ktor.http.content.files
+import io.ktor.http.content.resolveResource
+import io.ktor.http.content.static
+import io.ktor.locations.Location
+import io.ktor.locations.get
+import io.ktor.response.respond
+import io.ktor.routing.Route
 
 @Location("/styles/main.css")
 class MainCss()
