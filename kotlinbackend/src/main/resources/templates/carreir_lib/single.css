@@ -1,0 +1,27 @@
+body
+{
+    background-color: rgb(44, 43, 43);    
+}
+
+p
+{
+    color: whitesmoke;
+    margin-top: 50px; 
+}
+.img-fluid
+{
+    max-width: 85%;
+    padding-left: 180px;
+    padding-top: 50px;
+    opacity: 0.75;
+}
+
+.container
+{
+    width: 80%;
+}
+
+h1
+{
+    color: whitesmoke;
+}

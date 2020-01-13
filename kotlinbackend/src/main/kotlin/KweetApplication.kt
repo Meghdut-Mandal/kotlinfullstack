@@ -79,8 +79,8 @@ data class Notices(val start: Int = 0)
 @Location("/school/list/{offset}")
 data class SchoolsList(val offset: Int = 0)
 
-
-
+@Location("/carreir_lib")
+class CarrierLib
 
 /**
  * Represents a session in this site containing the userId.
@@ -216,7 +216,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
     // They are split in several methods and files, so it can scale for larger
     // applications keeping a reasonable amount of lines per file.
     routing {
-//        styles()
+        //        styles()
         index(dao)
         postNew(dao, hashFunction)
         delete(dao, hashFunction)
@@ -230,6 +230,11 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         static("styles") {
             resources("styles/")
         }
+        static("carreir_lib") {
+            resources("templates/carreir_lib/")
+
+        }
+        carrerLibrary(dao, hashFunction)
     }
 }
 

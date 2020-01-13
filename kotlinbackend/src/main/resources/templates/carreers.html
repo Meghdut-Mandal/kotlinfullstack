@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Schools</title>
+    <link rel="stylesheet" type="text/css"
+          href="https://unpkg.com/purecss@1.0.1/build/pure-min.css">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/grids-responsive-min.css">
+    <link rel="stylesheet" href="../styles/blog.css">
+    <link rel="stylesheet" href="/styles/blog.css">
+
+</head>
+<body>
+
+<div class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+        <div class="header">
+            <div class="brand-title">Vive</div>
+            <nav class="nav">
+                <ul class="nav-list">
+
+
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <h2>Explore Carrier Library </h2>
+
+        <br>
+        <br>
+        <br>
+        <br>
+
+        <table  class="pure-table">
+            <tr>
+                <th>Carriers  </th>
+            </tr>
+            <!--/*@thymesVar id="list" type="java.util.List<routes.Carrer>"*/-->
+            <tr th:each="data : ${list}" th:class="routes.Carrer">
+                <td> <a  th:href="${data.getLocation()}"  th:text="${data.getName()}" > It admin </a> </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        Vive Edusoft, ${.now?string("yyyy")}
+    </div>
+</div>
+
+
+</body>
+</html>
