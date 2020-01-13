@@ -10,6 +10,9 @@ import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
 import io.ktor.http.HttpHeaders
+import io.ktor.http.content.files
+import io.ktor.http.content.resources
+import io.ktor.http.content.static
 import io.ktor.locations.Location
 import io.ktor.locations.Locations
 import io.ktor.locations.locations
@@ -213,7 +216,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
     // They are split in several methods and files, so it can scale for larger
     // applications keeping a reasonable amount of lines per file.
     routing {
-        styles()
+//        styles()
         index(dao)
         postNew(dao, hashFunction)
         delete(dao, hashFunction)
@@ -224,6 +227,9 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         signUp(dao, hashFunction)
         notices(dao, hashFunction)
         schoolList(schoolsDao)
+        static("styles") {
+            resources("styles/")
+        }
     }
 }
 
