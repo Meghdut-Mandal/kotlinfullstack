@@ -37,33 +37,33 @@ class QuestionsDataBase(val subjectData: Nitrite, var questionData: Nitrite) {
     }
 }
 
-
-private val subjectsData = nitrite {
-    file = File("subjectsData.db")
-    compress = true
-    autoCompact = true
-}
-private val questionData = nitrite {
-    file = File("questionsData.db")
-    compress = true
-    autoCompact = true
-}
-private val questionsDataBase = QuestionsDataBase(subjectsData, questionData)
-// data in class 9 physics motion
-fun main() {
-    (6..12).forEach { clazz ->
-        val subjectsRepo = questionsDataBase.getSubjectsRepo(clazz)
-        subjectsRepo.find().forEach { subjectSnap ->
-            val chaptersRepo = questionsDataBase.getChaptersRepo(clazz, subjectSnap)
-            chaptersRepo.find().forEach { chapterSnap ->
-                val questionRepo =
-                        questionsDataBase.getQuestionRepo(clazz, subjectSnap, chapterSnap)
-                                questionRepo.find().forEach {
-                    println("dao>>main  $it ")
-                }
-
-            }
-        }
-
-    }
-}
+//
+//private val subjectsData = nitrite {
+//    file = File("subjectsData.db")
+//    compress = true
+//    autoCompact = true
+//}
+//private val questionData = nitrite {
+//    file = File("questionsData.db")
+//    compress = true
+//    autoCompact = true
+//}
+//private val questionsDataBase = QuestionsDataBase(subjectsData, questionData)
+//// data in class 9 physics motion
+//fun main() {
+//    (6..12).forEach { clazz ->
+//        val subjectsRepo = questionsDataBase.getSubjectsRepo(clazz)
+//        subjectsRepo.find().forEach { subjectSnap ->
+//            val chaptersRepo = questionsDataBase.getChaptersRepo(clazz, subjectSnap)
+//            chaptersRepo.find().forEach { chapterSnap ->
+//                val questionRepo =
+//                        questionsDataBase.getQuestionRepo(clazz, subjectSnap, chapterSnap)
+//                                questionRepo.find().forEach {
+//                    println("dao>>main  $it ")
+//                }
+//
+//            }
+//        }
+//
+//    }
+//}
