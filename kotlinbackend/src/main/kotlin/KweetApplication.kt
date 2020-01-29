@@ -1,4 +1,5 @@
 import dao.DAONitrateDataBase
+import dao.QuestionsDataBase
 import dao.SchoolListDAO
 import dao.ViveDao
 import freemarker.cache.ClassTemplateLoader
@@ -13,6 +14,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.content.files
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
+import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 import io.ktor.locations.Locations
 import io.ktor.locations.locations
@@ -30,6 +32,7 @@ import io.ktor.sessions.cookie
 import io.ktor.thymeleaf.Thymeleaf
 import io.ktor.util.hex
 import model.User
+import org.dizitart.kno2.nitrite
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import routes.*
 import java.io.File
@@ -72,6 +75,15 @@ class Logout
 
 @Location("/signup")
 class SignUp
+
+@Location("quiz/subjects/{clazz}")
+class SubjectsRequest(val clazz: Int)
+
+@Location("quiz/chapters")
+class ChaptersRequest(val clazz: Int, val subject: String)
+
+@Location("quiz/questions")
+class QuestionRequests(val clazz: Int, val subject: String, val chapter: String, val skip: Int = 0)
 
 @Location("/school/notices")
 data class Notices(val start: Int = 0)
@@ -121,6 +133,18 @@ val schoolsDao = SchoolListDAO(File("data/edugorrilas.db"))
  *
  * For more information about this file: https://ktor.io/servers/configuration.html#hocon-file
  */
+
+private val subjectsData = nitrite {
+    file = File("subjectsData.db")
+    compress = true
+    autoCompact = true
+}
+private val questionData = nitrite {
+    file = File("questionsData.db")
+    compress = true
+    autoCompact = true
+}
+private val questionsDataBase = QuestionsDataBase(subjectsData, questionData)
 fun main() {
 
     embeddedServer(Netty, port, module = Application::main).start()
@@ -139,6 +163,7 @@ fun Application.main() {
 }
 
 
+@KtorExperimentalLocationsAPI
 fun Application.mainWithDependencies(dao: ViveDao) {
     if (dao.getNoticeCount() == 0) {
         (1..120).map {
@@ -227,6 +252,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         signUp(dao, hashFunction)
         notices(dao, hashFunction)
         schoolList(schoolsDao)
+        quizLinks(questionsDataBase)
         static("styles") {
             resources("styles/")
         }
