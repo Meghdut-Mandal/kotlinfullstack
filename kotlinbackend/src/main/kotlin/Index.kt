@@ -1,10 +1,11 @@
 import dao.ViveDao
-import io.ktor.application.*
-import io.ktor.freemarker.*
-import io.ktor.locations.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.sessions.*
+import io.ktor.application.call
+import io.ktor.freemarker.FreeMarkerContent
+import io.ktor.locations.get
+import io.ktor.response.respond
+import io.ktor.routing.Route
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
 
 /**
  * Register the index route of the website.
@@ -20,7 +21,8 @@ fun Route.index(dao: ViveDao) {
         val latest = dao.latest(10).map { dao.getKweet(it) }
 
         // Generates an ETag unique string for this route that will be used for caching.
-        val etagString = user?.userId + "," + top.joinToString { it.id.toString() } + latest.joinToString { it.id.toString() }
+        val etagString =
+                user?.userId + "," + top.joinToString { it.id.toString() } + latest.joinToString { it.id.toString() }
         val etag = etagString.hashCode()
 
         // Uses FreeMarker to render the page.

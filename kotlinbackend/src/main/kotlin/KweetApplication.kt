@@ -11,7 +11,7 @@ import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
 import io.ktor.http.HttpHeaders
-import io.ktor.http.content.files
+import io.ktor.http.content.resource
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.locations.KtorExperimentalLocationsAPI
@@ -260,6 +260,10 @@ fun Application.mainWithDependencies(dao: ViveDao) {
             resources("templates/carreir_lib/")
 
         }
+        static("/") {
+            resources("templates/sample_site")
+            resource("/home", "templates/sample_site/home.html")
+        }
         carrerLibrary(dao, hashFunction)
     }
 }
@@ -278,7 +282,7 @@ fun hash(password: String): String {
  * with [Location] using the Locations feature.
  */
 suspend fun ApplicationCall.redirect(location: Any) {
-    val host = request.host() ?: "localhost"
+    val host = request.host()
     val portSpec = request.port().let { if (it == 80) "" else ":$it" }
     val address = host + portSpec
 
