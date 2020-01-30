@@ -52,6 +52,10 @@ val port = Integer.valueOf(System.getenv("PORT"))
 @Location("/")
 class Index
 
+@Location("/boot")
+class BootRequest
+
+
 @Location("/post-new")
 class PostNew
 
