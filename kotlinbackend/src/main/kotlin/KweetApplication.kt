@@ -155,6 +155,7 @@ fun main() {
     println(">>main  Running at http://localhost:$port/ ")
 }
 
+@KtorExperimentalLocationsAPI
 fun Application.main() {
     // First we initialize the database.
     dao.init()
