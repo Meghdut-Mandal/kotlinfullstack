@@ -1,7 +1,4 @@
-import dao.DAONitrateDataBase
-import dao.QuestionsDataBase
-import dao.SchoolListDAO
-import dao.ViveDao
+import dao.*
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
@@ -44,7 +41,9 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.random.Random
 
 
-val port = Integer.valueOf(System.getenv("PORT"))
+val port = Integer.valueOf(System.getenv("PORT") ?: "${8080 + Random.nextInt(50)}").also {
+    println(">>main  Running at http://localhost:$it/ ")
+}
 
 /*
  * Classes used for the locations feature to build urls and register routes.
@@ -88,6 +87,13 @@ class ChaptersRequest(val clazz: Int, val subject: String)
 
 @Location("quiz/questions")
 class QuestionRequests(val clazz: Int, val subject: String, val chapter: String, val skip: Int = 0)
+
+@Location("note/")
+class NoteRequest(val clazz: Int, val subject: String, val chapter: String)
+
+@Location("note/file")
+class NoteFileRequest(val clazz: Int, val subject: String, val chapter: String, val fileName: String)
+
 
 @Location("/school/notices")
 data class Notices(val start: Int = 0)
@@ -149,8 +155,8 @@ private val questionData = nitrite {
     autoCompact = true
 }
 private val questionsDataBase = QuestionsDataBase(subjectsData, questionData)
+private val notesDao = NotesDao(subjectsData, File("notes"))
 fun main() {
-
     embeddedServer(Netty, port, module = Application::main).start()
     println(">>main  Running at http://localhost:$port/ ")
 }
@@ -258,16 +264,19 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         notices(dao, hashFunction)
         schoolList(schoolsDao)
         quizLinks(questionsDataBase)
+        notesLinks(notesDao)
         static("styles") {
             resources("styles/")
         }
         static("carreir_lib") {
             resources("templates/carreir_lib/")
-
         }
         static("/") {
             resources("templates/sample_site")
             resource("/home", "templates/sample_site/home.html")
+        }
+        static("notes") {
+            resources("templates/notes/")
         }
         carrerLibrary(dao, hashFunction)
     }

@@ -49,8 +49,3 @@ fun Route.quizLinks(questionsDataBase: QuestionsDataBase) {
 
 }
 
-private fun QuestionsDataBase.getSubject(clazz: Int, subjectSlug: String) =
-        this.getSubjectsRepo(clazz).find().first { it.slug == subjectSlug }
-
-private fun QuestionsDataBase.getChapter(clazz: Int, subjectSnap: SubjectSnap, chapterSlug: String) =
-        this.getChaptersRepo(clazz, subjectSnap).find().first { it.slug == chapterSlug }
