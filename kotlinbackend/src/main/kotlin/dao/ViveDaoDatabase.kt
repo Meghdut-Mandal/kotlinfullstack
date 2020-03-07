@@ -1,12 +1,12 @@
 package dao
 
 import Post
-import model.Kweet
+import model.Notice
 import model.User
 import org.dizitart.kno2.filters.eq
 import org.dizitart.kno2.nitrite
-import org.joda.time.*
-import java.io.*
+import java.io.Closeable
+import java.io.File
 import kotlin.random.Random
 
 /**
@@ -34,16 +34,12 @@ interface ViveDao : Closeable {
      */
     fun init()
 
-    /**
-     * Counts the number of replies of a kweet identified by its [id].
-     */
-    fun countReplies(id: Int): Int
 
     /**
      * Creates a Kweet from a specific [user] name, the kweet [text] content,
      * an optional [replyTo] id of the parent kweet, and a [date] that would default to the current time.
      */
-    fun createKweet(user: String, text: String, replyTo: Int? = null, date: DateTime = DateTime.now()): Long
+    fun createKweet(notice: Notice): Long
 
     /**
      * Deletes a kweet from its [id].
@@ -53,7 +49,7 @@ interface ViveDao : Closeable {
     /**
      * Get the DAO object representation of a kweet based from its [id].
      */
-    fun getKweet(id: Long): Kweet
+    fun getKweet(id: Long): Notice?
 
     /**
      * Obtains a list of integral ids of kweets from a specific user identified by its [userId].
@@ -93,7 +89,7 @@ interface ViveDao : Closeable {
 
 class DAONitrateDataBase(val dbFile: File) : ViveDao {
     val db = nitrite { file = dbFile }
-    val tweetRepo = db.getRepository(Kweet::class.java)
+    val tweetRepo = db.getRepository(Notice::class.java)
     val userRepo = db.getRepository(User::class.java)
     val postRepo = db.getRepository(Post::class.java)
 
@@ -121,23 +117,20 @@ class DAONitrateDataBase(val dbFile: File) : ViveDao {
     override fun init() {
     }
 
-    override fun countReplies(id: Int): Int {
-        return tweetRepo.find().filter { it.replyTo == id }.count()
-    }
 
-    override fun createKweet(user: String, text: String, replyTo: Int?, date: DateTime): Long {
+    override fun createKweet(notice: Notice): Long {
         val id = Random.nextLong(0, 30000)
-        tweetRepo.insert(Kweet(id, user, text, (date).toString(), replyTo))
+        tweetRepo.insert(notice)
         db.commit()
-        return id;
+        return id
     }
 
     override fun deleteKweet(id: Int) {
-        tweetRepo.remove(Kweet::id eq id)
+        tweetRepo.remove(Notice::id eq id)
     }
 
-    override fun getKweet(id: Long): Kweet {
-        return tweetRepo.find(Kweet::id eq id).firstOrDefault() ?:Kweet(id,"none","none","noed",12)
+    override fun getKweet(id: Long): Notice? {
+        return tweetRepo.find(Notice::id eq id).firstOrDefault()
     }
 
     override fun userKweets(userId: String): List<Long> {

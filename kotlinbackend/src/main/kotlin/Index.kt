@@ -22,7 +22,7 @@ fun Route.index(dao: ViveDao) {
 
         // Generates an ETag unique string for this route that will be used for caching.
         val etagString =
-                user?.userId + "," + top.joinToString { it.id.toString() } + latest.joinToString { it.id.toString() }
+                user?.userId + "," + top.joinToString { it?.id.toString() } + latest.joinToString { it?.id.toString() }
         val etag = etagString.hashCode()
 
         // Uses FreeMarker to render the page.

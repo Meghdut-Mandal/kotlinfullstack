@@ -1,3 +1,4 @@
+import com.google.gson.Gson
 import dao.*
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
@@ -44,6 +45,7 @@ import kotlin.random.Random
 val port = Integer.valueOf(System.getenv("PORT") ?: "${8080 + Random.nextInt(50)}").also {
     println(">>main  Running at http://localhost:$it/ ")
 }
+val gson = Gson()
 
 /*
  * Classes used for the locations feature to build urls and register routes.
@@ -57,6 +59,9 @@ class BootRequest
 
 @Location("/post-new")
 class PostNew
+
+@Location("/notice/create")
+class NoticeCreate
 
 @Location("/kweet/{id}/delete")
 class KweetDelete(val id: Int)

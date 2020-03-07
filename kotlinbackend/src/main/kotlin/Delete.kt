@@ -1,10 +1,11 @@
 import dao.ViveDao
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.request.*
-import io.ktor.routing.*
-import io.ktor.sessions.*
+import io.ktor.application.call
+import io.ktor.http.Parameters
+import io.ktor.locations.post
+import io.ktor.request.receive
+import io.ktor.routing.Route
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
 
 /**
  * Registers a route for deleting deleting kweets.
@@ -24,7 +25,7 @@ fun Route.delete(dao: ViveDao, hashFunction: (String) -> String) {
         val kweet = dao.getKweet(id.toLong())
 
         // Verifies that the kweet user matches the session user and that the code and the date matches, to prevent CSFR.
-        if (user == null || kweet.userId != user.userId || !call.verifyCode(date, user, code, hashFunction)) {
+        if (user == null || kweet?.userId != user.userId || !call.verifyCode(date, user, code, hashFunction)) {
             call.redirect(ViewKweet(id))
         } else {
             dao.deleteKweet(id.toInt())

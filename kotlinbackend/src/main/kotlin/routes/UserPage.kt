@@ -3,13 +3,14 @@ package routes
 import KweetSession
 import UserPage
 import dao.ViveDao
-import io.ktor.application.*
-import io.ktor.freemarker.*
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.sessions.*
+import io.ktor.application.call
+import io.ktor.freemarker.FreeMarkerContent
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.get
+import io.ktor.response.respond
+import io.ktor.routing.Route
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
 
 /**
  * Register the [UserPage] route '/user/{user}',
@@ -28,9 +29,8 @@ fun Route.userPage(dao: ViveDao) {
             call.respond(HttpStatusCode.NotFound.description("User ${it.user} doesn't exist"))
         } else {
             val kweets = dao.userKweets(it.user).map { dao.getKweet(it) }
-            val etag = (user?.userId ?: "") + "_" + kweets.map { it.text.hashCode() }.hashCode().toString()
 
-            call.respond(FreeMarkerContent("user.ftl", mapOf("user" to user, "pageUser" to pageUser, "kweets" to kweets), etag))
+            call.respond(FreeMarkerContent("user.ftl", mapOf("user" to user, "pageUser" to pageUser, "kweets" to kweets), "etag"))
         }
     }
 }

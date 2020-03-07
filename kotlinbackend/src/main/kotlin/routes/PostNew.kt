@@ -2,20 +2,27 @@ package routes
 
 import KweetSession
 import Login
+import NoticeCreate
 import PostNew
 import ViewKweet
 import dao.ViveDao
-import io.ktor.application.*
-import io.ktor.freemarker.*
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.sessions.*
+import gson
+import io.ktor.application.call
+import io.ktor.freemarker.FreeMarkerContent
+import io.ktor.http.Parameters
+import io.ktor.locations.get
+import io.ktor.locations.post
+import io.ktor.request.receive
+import io.ktor.request.receiveText
+import io.ktor.response.respond
+import io.ktor.routing.Route
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
+import model.Notice
 import redirect
 import securityCode
 import verifyCode
+import kotlin.random.Random
 
 /**
  * Register routes for the [PostNew] route '/post-new'
@@ -40,9 +47,9 @@ fun Route.postNew(dao: ViveDao, hashFunction: (String) -> String) {
         }
     }
     /**
-     * A POST request actually tries to create a new [Kweet].
+     * A POST request actually tries to create a new [Notice].
      * It validates the `date`, `code` and `text` parameters and redirects to the login page on failure.
-     * On success it creates the new [Kweet] and redirect to the [ViewKweet] page to view that specific Kweet.
+     * On success it creates the new [Notice] and redirect to the [ViewKweet] page to view that specific Kweet.
      */
     post<PostNew> {
         val user = call.sessions.get<KweetSession>()?.let { dao.user(it.userId) }
@@ -55,8 +62,17 @@ fun Route.postNew(dao: ViveDao, hashFunction: (String) -> String) {
         if (user == null || !call.verifyCode(date, user, code, hashFunction)) {
             call.redirect(Login())
         } else {
-            val id = dao.createKweet(user.userId, text, null)
-            call.redirect(ViewKweet(id.toString()))
+//            val kweet=Kweet("sdsd","",23,"")
+//            val id = dao.createKweet(user.userId, text, null)
+//            call.redirect(ViewKweet(id.toString()))
         }
+    }
+
+    post<NoticeCreate> {
+        val receiveText = call.receiveText()
+        val kweet = gson.fromJson(receiveText, Notice::class.java)
+        dao.createKweet(kweet.copy(id = System.currentTimeMillis() + Random.nextLong(34)))
+        println("routes>>postNew  $kweet ")
+        call.respond("Done Bro !!")
     }
 }

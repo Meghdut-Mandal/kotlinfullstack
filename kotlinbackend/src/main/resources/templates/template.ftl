@@ -49,7 +49,7 @@
 </#macro>
 
 <#macro kweet_li kweet>
-<#-- @ftlvariable name="kweet" type="model.Kweet" -->
+<#-- @ftlvariable name="kweet" type="model.Notice" -->
 <section class="post">
     <header class="post-header">
         <p class="post-meta">
