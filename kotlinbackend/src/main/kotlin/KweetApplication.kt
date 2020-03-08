@@ -19,8 +19,8 @@ import io.ktor.locations.locations
 import io.ktor.request.header
 import io.ktor.request.host
 import io.ktor.request.port
+import io.ktor.response.respond
 import io.ktor.response.respondRedirect
-import io.ktor.response.respondText
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -30,6 +30,7 @@ import io.ktor.sessions.cookie
 import io.ktor.thymeleaf.Thymeleaf
 import io.ktor.util.hex
 import model.User
+import model.getErrorResponse
 import org.dizitart.kno2.nitrite
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import routes.*
@@ -42,9 +43,7 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.random.Random
 
 
-val port = Integer.valueOf(System.getenv("PORT") ?: "${8080 + Random.nextInt(50)}").also {
-    println(">>main  Running at http://localhost:$it/ ")
-}
+val port = Integer.valueOf(System.getenv("PORT") ?: "8085")
 val gson = Gson()
 
 /*
@@ -56,12 +55,9 @@ class Index
 @Location("/boot")
 class BootRequest
 
-
-@Location("/post-new")
-class PostNew
-
 @Location("/notice/create")
 class NoticeCreate
+
 
 @Location("/kweet/{id}/delete")
 class KweetDelete(val id: Int)
@@ -123,11 +119,6 @@ val hashKey = hex("6819b57a326945c1968f45236589")
  * File where the database is going to be stored.
  */
 val dir = File("build/db")
-
-/**
- * Pool of JDBC connections used.
- */
-
 
 /**
  * HMac SHA1 key spec for the password hashing.
@@ -209,12 +200,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
     install(StatusPages) {
         exception<Throwable> { cause ->
             cause.printStackTrace()
-            val errorMessage = """
-                Error !! 
-                Short Message :- $cause.localizedMessage
-                Stack Trace   :-${cause.stackTrace.joinToString(separator = "\n")}
-            """.trimIndent()
-            call.respondText { errorMessage }
+            call.respond(cause.getErrorResponse())
         }
     }
     // This uses use the logger to log every call (request/response)

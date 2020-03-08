@@ -10,6 +10,7 @@ import io.ktor.thymeleaf.ThymeleafContent
 
 fun Route.signUp(dao: ViveDao, hashFunction: (String) -> String) {
 
+
     get<SignUp> {
         call.respond(ThymeleafContent("signup", mapOf("user" to "abc")))
     }

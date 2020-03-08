@@ -19,3 +19,5 @@ data class Notice(@Id val id: Long,
                   val userImage: String,
                   @SerializedName("userName")
                   val userName: String) : Serializable
+
+

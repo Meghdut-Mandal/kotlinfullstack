@@ -9,12 +9,12 @@ import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.routing.Route
+import model.AbstractAPIResponse
 import model.quiz.essential.SubjectSnap
 import model.quiz.qbank.Question
 import org.dizitart.no2.FindOptions
 import org.dizitart.no2.exceptions.ValidationException
 
-class AbstractAPIResponse<T>(val statusCode: Int, val skip: Int = 0, val limit: Int, val dataList: List<T>)
 
 
 @KtorExperimentalLocationsAPI
