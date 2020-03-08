@@ -84,6 +84,8 @@ interface ViveDao : Closeable {
      * Returns a list of Keet ids, with the recent ones first.
      */
     fun latest(count: Int = 10): List<Long>
+
+    fun resetData()
 }
 
 
@@ -105,7 +107,7 @@ class DAONitrateDataBase(val dbFile: File) : ViveDao {
     }
 
     override fun insertNotice(post: Post): Long {
-        val id = System.currentTimeMillis()
+        val id = System.nanoTime()
         postRepo.insert(post.copy(id = id))
         return id
     }
@@ -156,6 +158,13 @@ class DAONitrateDataBase(val dbFile: File) : ViveDao {
 
     override fun latest(count: Int): List<Long> {
         return top(10)
+    }
+
+    override fun resetData() {
+        tweetRepo.dropAllIndices()
+        userRepo.dropAllIndices()
+        postRepo.dropAllIndices()
+        db.commit()
     }
 
     override fun close() {

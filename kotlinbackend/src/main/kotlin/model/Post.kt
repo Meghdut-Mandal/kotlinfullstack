@@ -1,22 +1,25 @@
-import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import kotlin.random.Random
+import org.dizitart.no2.objects.Id
 
 
 data class PostResponse(
         @SerializedName("total")
-        val total:Int,
+        val total: Int,
         @SerializedName("start")
-        val start:Int,
+        val start: Int,
         @SerializedName("status")
-        val status:String,
+        val status: String,
         @SerializedName("postList")
-        val postList:List<Post>
+        val postList: List<Post>
 )
-data class PostMakeResponse(val id:Long, val status: String)
+
+data class PostMakeResponse(val id: Long, val status: String)
 data class Post(
+        @Id
         @SerializedName("postId")
-        val id:Long,
+        val id: Long,
+        @SerializedName("userID")
+        val userId: String,
         @SerializedName("likesCount")
         val likesCount: Int,
         @SerializedName("postLocation")
@@ -32,16 +35,6 @@ data class Post(
 )
 
 fun main() {
-    val toList = (1..12).map { Post(
-            Random.nextInt(200).toLong(),
-            12,
-            "Patna,Bihar",
-            "Tomorrow the school will be closed ",
-            "2W",
-            "https://randomuser.me/api/portraits/med/men/75.jpg",
-            "Vivek Kr Yadav"
-    ) }.toList()
-    val status=PostResponse(200,10,"200",toList)
-    val str = Gson().toJsonTree(status)
-    println("com.vive.vivesap.models.post>>>main $str ")
+
+
 }

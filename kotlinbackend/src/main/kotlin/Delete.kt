@@ -1,8 +1,10 @@
 import dao.ViveDao
 import io.ktor.application.call
 import io.ktor.http.Parameters
+import io.ktor.locations.get
 import io.ktor.locations.post
 import io.ktor.request.receive
+import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
@@ -11,6 +13,12 @@ import io.ktor.sessions.sessions
  * Registers a route for deleting deleting kweets.
  */
 fun Route.delete(dao: ViveDao, hashFunction: (String) -> String) {
+
+    get<DeleteNotices> {
+        dao.resetData()
+        call.respondText { "Done " }
+    }
+
     // Uses the location feature to register a post route for '/kweet/{id}/delete'.
     post<KweetDelete> {
         // Tries to get (null on failure) the user associated to the current KweetSession
