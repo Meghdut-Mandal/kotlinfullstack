@@ -9,6 +9,7 @@ import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.resource
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
@@ -64,6 +65,10 @@ class KweetDelete(val id: Int)
 @Location("/view_kweet/{id}")
 data class ViewKweet(val id: String)
 
+@Location("/user/image/{userID}")
+data class UserImageRequest(val userID: String)
+
+
 @Location("/user/{user}")
 data class UserPage(val user: String)
 
@@ -104,6 +109,10 @@ data class SchoolsList(val offset: Int = 0)
 @Location("/carreir_lib")
 class CarrierLib
 
+
+@Location("/attandance")
+class AttandanceRequest(val teacherID: String)
+
 /**
  * Represents a session in this site containing the userId.
  */
@@ -128,8 +137,8 @@ val hmacKey = SecretKeySpec(hashKey, "HmacSHA1")
  * Constructs a facade with the database, connected to the DataSource configured earlier with the [dir]
  * for storing the database.
  */
-val dao: ViveDao = DAONitrateDataBase(File("data/data.db"))
-val schoolsDao = SchoolListDAO(File("data/edugorrilas.db"))
+private val dao: ViveDao = DAONitrateDataBase(File("data/data.db"))
+private val schoolsDao = SchoolListDAO(File("data/edugorrilas.db"))
 //DAOFacadeCache(DAOFacadeDatabase(Database.connect(pool)), File(dir.parentFile, "ehcache"))
 
 /**
@@ -149,6 +158,13 @@ private val questionData = nitrite {
     compress = true
     autoCompact = true
 }
+private val attendanceData = nitrite {
+    file = File("data/attendance.db")
+    compress = true
+    autoCompact = true
+}
+private val attendanceDAO = AttendanceDAO(attendanceData)
+
 private val questionsDataBase = QuestionsDataBase(subjectsData, questionData)
 private val notesDao = NotesDao(subjectsData, File("notes"))
 fun main() {
@@ -184,7 +200,11 @@ fun Application.mainWithDependencies(dao: ViveDao) {
     install(StatusPages) {
         exception<Throwable> { cause ->
             cause.printStackTrace()
-            call.respond(cause.getErrorResponse())
+            call.respond(HttpStatusCode.NotImplemented, cause.getErrorResponse())
+        }
+        status(HttpStatusCode.NotFound)
+        {
+            call.respond(HttpStatusCode.NotFound, "Sorry Please check the Url")
         }
     }
     // This uses use the logger to log every call (request/response)
@@ -240,6 +260,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         schoolList(schoolsDao)
         quizLinks(questionsDataBase)
         notesLinks(notesDao)
+        attandanceHelper(attendanceDAO)
         static("styles") {
             resources("styles/")
         }

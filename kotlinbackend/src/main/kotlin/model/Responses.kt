@@ -4,4 +4,4 @@ data class AbstractAPIResponse<T>(val statusCode: Int, val skip: Int = 0, val li
 data class ErrorResponse(val title: String, val shortMessage: String, val stacktrace: String)
 
 fun Throwable.getErrorResponse() =
-        ErrorResponse(this::class.toString(), this.localizedMessage, this.stackTrace.joinToString(separator = "\n"))
+        ErrorResponse(this::class.simpleName.toString(), this.localizedMessage, this.stackTrace.joinToString(separator = "\n"))

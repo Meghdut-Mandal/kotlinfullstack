@@ -28,6 +28,8 @@ interface ViveDao : Closeable {
     fun getNoticeCount(): Int
 
 
+    fun getStudentOf(teacherId: String): List<User>
+
     /**
      * Initializes all the required data.
      * In this case this should initialize the Users and Kweets tables.
@@ -114,6 +116,10 @@ class DAONitrateDataBase(val dbFile: File) : ViveDao {
 
     override fun getNoticeCount(): Int {
         return postRepo.find().idSet().size
+    }
+
+    override fun getStudentOf(teacherId: String): List<User> {
+        return userRepo.find().toList() ?: arrayListOf()
     }
 
     override fun init() {
