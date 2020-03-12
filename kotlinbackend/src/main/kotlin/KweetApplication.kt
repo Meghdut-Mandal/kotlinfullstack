@@ -255,7 +255,6 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         viewKweet(dao, hashFunction)
         login(dao, hashFunction)
         register(dao, hashFunction)
-        signUp(dao, hashFunction)
         notices(dao, hashFunction)
         schoolList(schoolsDao)
         quizLinks(questionsDataBase)
