@@ -110,8 +110,16 @@ data class SchoolsList(val offset: Int = 0)
 class CarrierLib
 
 
-@Location("/attandance")
-class AttandanceRequest(val teacherID: String)
+@Location("/attandance/{teacherID}")
+class AttendanceRequest(val teacherID: String) {
+
+    @Location("/todays")
+    class Model(val attendanceRequest: AttendanceRequest)
+
+    @Location("/add/{studentID}")
+    class AddStudent(val attendanceRequest: AttendanceRequest, val studentID: String)
+
+}
 
 /**
  * Represents a session in this site containing the userId.
@@ -190,6 +198,8 @@ fun Application.mainWithDependencies(dao: ViveDao) {
     // This adds automatically Date and Server headers to each response, and would allow you to configure
     // additional headers served to each response.
     install(DefaultHeaders)
+    install(CORS)
+
     install(Thymeleaf) {
         setTemplateResolver(ClassLoaderTemplateResolver().apply {
             prefix = "templates/"
