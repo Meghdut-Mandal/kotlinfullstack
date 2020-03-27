@@ -215,6 +215,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         maxAge = Duration.ofDays(1)
         header("key")
     }
+//    println(">>mainWithDependencies   ")
     install(DefaultHeaders)
 
     install(Thymeleaf) {

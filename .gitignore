@@ -11,3 +11,8 @@ kotlinbackend/.gradle
 kotlinfrontend/web
 /kotlinbackend-1.0-SNAPSHOT-all.jar
 /kotlinbackend/src/main/kotlin/dao/DaoTests.kt
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
