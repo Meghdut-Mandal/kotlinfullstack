@@ -9,6 +9,7 @@ import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.resource
 import io.ktor.http.content.resources
@@ -38,6 +39,7 @@ import routes.*
 import java.io.File
 import java.net.URI
 import java.text.DateFormat
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -197,8 +199,23 @@ fun Application.main() {
 fun Application.mainWithDependencies(dao: ViveDao) {
     // This adds automatically Date and Server headers to each response, and would allow you to configure
     // additional headers served to each response.
-    install(DefaultHeaders)
     install(CORS)
+    {
+        method(HttpMethod.Options)
+        method(HttpMethod.Get)
+        method(HttpMethod.Post)
+        method(HttpMethod.Put)
+        method(HttpMethod.Delete)
+        method(HttpMethod.Patch)
+        header(HttpHeaders.AccessControlAllowHeaders)
+        header(HttpHeaders.ContentType)
+        header(HttpHeaders.AccessControlAllowOrigin)
+        allowCredentials = true
+        anyHost()
+        maxAge = Duration.ofDays(1)
+        header("key")
+    }
+    install(DefaultHeaders)
 
     install(Thymeleaf) {
         setTemplateResolver(ClassLoaderTemplateResolver().apply {
