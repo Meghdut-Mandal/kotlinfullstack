@@ -7,6 +7,8 @@ import dao.QuestionsDataBase
 import io.ktor.application.call
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
+import io.ktor.locations.post
+import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import model.AbstractPagableAPIResponse
@@ -45,6 +47,23 @@ fun Route.quizLinks(questionsDataBase: QuestionsDataBase) {
         }
         val apiResponse = AbstractPagableAPIResponse(200, request.skip, find.size, find)
         call.respond(apiResponse)
+    }
+
+    post<QuestionRequests> { request ->
+        val list = call.receive<List<Question>>()
+        val subjectSnap = questionsDataBase.getSubject(request.clazz, request.subject)
+        val chapterSnap =
+                questionsDataBase.getChapter(request.clazz, subjectSnap, request.chapter)
+        val questionRepo =
+                questionsDataBase.getQuestionRepo(request.clazz, subjectSnap, chapterSnap)
+        list.parallelStream().forEach {
+            try {
+                questionRepo.insert(it)
+            }
+            catch (e: Exception) {
+            }
+        }
+        call.respond("Done bro !")
     }
 
 

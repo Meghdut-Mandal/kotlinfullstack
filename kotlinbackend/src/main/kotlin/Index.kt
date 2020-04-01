@@ -28,6 +28,7 @@ fun Route.index(dao: ViveDao) {
 //        call.respond(FreeMarkerContent("index.ftl", mapOf("top" to top, "latest" to latest, "user" to user), etag.toString()))
     }
 
+
     get<BootRequest> {
         call.respond("Booted !")
     }

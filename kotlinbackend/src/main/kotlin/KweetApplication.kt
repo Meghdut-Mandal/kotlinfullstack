@@ -60,6 +60,15 @@ class BootRequest
 @Location("/school/notices/delete")
 class DeleteNotices
 
+@Location("/teacher/")
+class TeacherRequest {
+    @Location("/register")
+    class SignUpPage
+
+    @Location("/login")
+    class LogInRequest
+}
+
 
 @Location("/kweet/{id}/delete")
 class KweetDelete(val id: Int)
@@ -173,7 +182,13 @@ private val attendanceData = nitrite {
     compress = true
     autoCompact = true
 }
+private val teachersDao = nitrite {
+    file = File("data/teacher.db")
+    compress = true
+    autoCompact = true
+}
 private val attendanceDAO = AttendanceDAO(attendanceData)
+private val teacherDao: TeacherDao = TeacherDaoImpl(teachersDao)
 
 private val questionsDataBase = QuestionsDataBase(subjectsData, questionData)
 private val notesDao = NotesDao(subjectsData, File("notes"))
@@ -288,6 +303,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         quizLinks(questionsDataBase)
         notesLinks(notesDao)
         attandanceHelper(attendanceDAO)
+        teachers(teacherDao)
         static("styles") {
             resources("styles/")
         }
