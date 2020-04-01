@@ -116,6 +116,17 @@
         }
     }
 </style>
+<script type="text/javascript">
+    var check = function () {
+        if (document.getElementById('password').value == document.getElementById('confirm_password').value) {
+            document.getElementById('message').style.color = 'green';
+            document.getElementById('message').innerHTML = 'matching';
+        } else {
+            document.getElementById('message').style.color = 'red';
+            document.getElementById('message').innerHTML = 'not matching';
+        }
+    }
+</script>
 <body>
 
 
@@ -132,10 +143,12 @@
             <input name="email" placeholder="Enter Email" required type="text">
 
             <label><b>Password</b></label>
-            <input name="psw" placeholder="Enter Password" required type="password">
+            <input id="password" name="psw" placeholder="Enter Password" required type="password">
 
-            <label><b>Repeat Password</b></label>
-            <input name="psw-repeat" placeholder="Repeat Password" required type="password">
+            <label><b>Repeat Password</b> <span id='message'></span>
+                <input id="confirm_password" name="psw-repeat" onkeyup='check();'
+                       placeholder="Repeat Password" required type="password">
+            </label>
 
             <p>By creating an account you agree to our <a href="#" style="color:dodgerblue">Terms &
                 Privacy</a>.</p>
