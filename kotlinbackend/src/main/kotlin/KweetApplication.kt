@@ -31,6 +31,7 @@ import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
 import io.ktor.thymeleaf.Thymeleaf
 import io.ktor.util.hex
+import model.UploadDaoImpl
 import model.User
 import model.getErrorResponse
 import org.dizitart.kno2.nitrite
@@ -38,10 +39,11 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import routes.*
 import java.io.File
 import java.net.URI
+import java.security.MessageDigest
 import java.text.DateFormat
 import java.time.Duration
+import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 
@@ -67,6 +69,12 @@ class TeacherRequest {
 
     @Location("/login")
     class LogInRequest
+
+    @Location("/upload_id/")
+    class UploadID
+
+    @Location("/upload/")
+    class UploadNotes
 }
 
 
@@ -187,6 +195,13 @@ private val teachersDao = nitrite {
     compress = true
     autoCompact = true
 }
+private val uploadsData = nitrite {
+    file = File("data/uploads.db")
+    compress = true
+    autoCompact = true
+}
+private val uploadsDao = UploadDaoImpl(uploadsData, { s -> hash(s) })
+
 private val attendanceDAO = AttendanceDAO(attendanceData)
 private val teacherDao: TeacherDao = TeacherDaoImpl(teachersDao)
 
@@ -196,6 +211,7 @@ fun main() {
     embeddedServer(Netty, port, module = Application::main).start()
     println(">>main  Running at http://localhost:$port/ ")
 }
+
 
 @KtorExperimentalLocationsAPI
 fun Application.main() {
@@ -303,7 +319,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         quizLinks(questionsDataBase)
         notesLinks(notesDao)
         attandanceHelper(attendanceDAO)
-        teachers(teacherDao)
+        teachers(teacherDao, uploadsDao)
         static("styles") {
             resources("styles/")
         }
@@ -324,10 +340,11 @@ fun Application.mainWithDependencies(dao: ViveDao) {
 /**
  * Method that hashes a [password] by using the globally defined secret key [hmacKey].
  */
-fun hash(password: String): String {
-    val hmac = Mac.getInstance("HmacSHA1")
-    hmac.init(hmacKey)
-    return hex(hmac.doFinal(password.toByteArray(Charsets.UTF_8)))
+fun hash(string: String): String {
+    val data = string.toByteArray()
+    val digester = MessageDigest.getInstance("SHA-256")
+    digester.update(data)
+    return Base64.getEncoder().encodeToString(digester.digest())
 }
 
 /**

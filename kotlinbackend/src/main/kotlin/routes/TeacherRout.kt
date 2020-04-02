@@ -1,18 +1,24 @@
 package routes
 
+import TeacherRequest
 import TeacherRequest.SignUpPage
 import dao.TeacherDao
+import hash
 import io.ktor.application.call
 import io.ktor.http.Parameters
+import io.ktor.http.content.PartData
+import io.ktor.http.content.forEachPart
+import io.ktor.http.content.streamProvider
 import io.ktor.locations.get
 import io.ktor.locations.post
 import io.ktor.request.receive
+import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.thymeleaf.ThymeleafContent
+import model.StringResponse
 import model.Teacher
-import java.security.MessageDigest
-import java.util.*
+import model.UploadsDao
 
 
 /*
@@ -26,14 +32,9 @@ class TeacherRequest
     class LogInRequest
 }
  */
-fun hash(string: String): String {
-    val data = string.toByteArray()
-    val digester = MessageDigest.getInstance("SHA-256")
-    digester.update(data)
-    return Base64.getEncoder().encodeToString(digester.digest())
-}
 
-fun Route.teachers(teacherDao: TeacherDao) {
+
+fun Route.teachers(teacherDao: TeacherDao, uploadsDao: UploadsDao) {
     get<SignUpPage> {
         call.respond(ThymeleafContent("teacher_signup", mapOf()))
     }
@@ -55,5 +56,43 @@ fun Route.teachers(teacherDao: TeacherDao) {
                 call.respond("Registration done sucessfully for $teacher")
             else call.respond("Some internal error is there !")
         }
+    }
+    get<TeacherRequest.UploadID> {
+
+    }
+
+    post<TeacherRequest.UploadNotes> {
+        val multipart = call.receiveMultipart()
+        var uploadId: String? = null
+        var filePart: PartData.FileItem? = null
+        multipart.forEachPart { part ->
+            // if part is a file (could be form item)
+            if (part is PartData.FileItem) {
+                filePart = part
+            } else if (part is PartData.FormItem)
+                uploadId = part.value
+
+        }
+        if (uploadId != null) {
+            val file = uploadsDao.getUploadFile(uploadId!!)
+            filePart!!.streamProvider().use { its ->
+                // copy the stream to the file with buffering
+                file.outputStream().buffered().use {
+                    // note that this is blocking
+                    its.copyTo(it)
+                    return@post call.respond(StringResponse(200, "Successfully uploaded "))
+                }
+            }
+            return@post call.respond(StringResponse(300, "Error in upload"))
+        } else {
+            call.respond(StringResponse(300, "Error in upload"))
+        }
+        multipart.forEachPart { part ->
+            // make sure to dispose of the part after use to prevent leaks
+
+            part.dispose()
+        }
+
+
     }
 }
