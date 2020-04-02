@@ -12,6 +12,10 @@ interface UploadsDao {
      */
     fun hasUpload(uploadId: String): Boolean
 
+    /*
+     Get the upload having the given ID
+     */
+    fun getUpload(uploadId: String): Upload
 
     /*
     Get the path of the file stored in the temp dir
@@ -38,6 +42,10 @@ class UploadDaoImpl(val uploadDb: Nitrite, val hashFunc: (String) -> String, val
 
     override fun hasUpload(uploadId: String): Boolean {
         return repository.find(Upload::id eq uploadId).any()
+    }
+
+    override fun getUpload(uploadId: String): Upload {
+        return repository.find(Upload::id eq uploadId).first()
     }
 
     override fun getUploadFile(uploadId: String): File {
