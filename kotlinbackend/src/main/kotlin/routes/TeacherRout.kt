@@ -55,7 +55,7 @@ fun Route.teachers(teacherDao: TeacherDao, uploadsDao: UploadsDao) {
                     Teacher(userEmail, hash(userEmail + userPassword), userName, arrayListOf())
             val sucess = teacherDao.addTeacher(teacher)
             if (sucess)
-                call.respond("Registration done sucessfully for $teacher")
+                call.respond(ThymeleafContent("registration_sucesspage", mapOf()))
             else call.respond("Some internal error is there !")
         }
     }
@@ -81,9 +81,10 @@ fun Route.teachers(teacherDao: TeacherDao, uploadsDao: UploadsDao) {
     }
 
     get<TeacherRequest.UploadNotes> {
-
-        if (uploadsDao.addUpload())
-            uploadsDao.getUploadFile(it.uploadID)
+        if (uploadsDao.hasUpload(it.upload_id)) {
+            val upload = uploadsDao.getUpload(it.upload_id)
+            return@get call.respond(upload)
+        } else return@get call.respond(StringResponse(300, "Invaid Upload ID"))
     }
 
     post<TeacherRequest.UploadNotes> {
