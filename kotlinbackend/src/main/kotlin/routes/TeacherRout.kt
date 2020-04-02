@@ -2,6 +2,7 @@ package routes
 
 import TeacherRequest
 import TeacherRequest.SignUpPage
+import com.google.gson.Gson
 import dao.TeacherDao
 import hash
 import io.ktor.application.call
@@ -17,6 +18,7 @@ import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.thymeleaf.ThymeleafContent
 import model.StringResponse
+import model.SubjectTaught
 import model.Teacher
 import model.UploadsDao
 
@@ -57,7 +59,24 @@ fun Route.teachers(teacherDao: TeacherDao, uploadsDao: UploadsDao) {
             else call.respond("Some internal error is there !")
         }
     }
-    get<TeacherRequest.UploadID> {
+
+
+
+
+    post<TeacherRequest.UploadID> {
+
+        val post = call.receive<Parameters>()
+        val message = StringResponse(300, "Error in parameters")
+        val teacherID = post["teacherid"] ?: return@post call.respond(message)
+        val taught = post["taughtby"] ?: return@post call.respond(message)
+        val chapterName = post["chaptername"] ?: return@post call.respond(message)
+        val taughtBy = Gson().fromJson(taught, SubjectTaught::class.java)
+                ?: return@post call.respond(message)
+
+        val upload = uploadsDao.addUpload(teacherID, taughtBy, chapterName)
+
+        return@post call.respond(StringResponse(200, upload))
+
 
     }
 
