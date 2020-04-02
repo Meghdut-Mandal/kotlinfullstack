@@ -80,6 +80,12 @@ fun Route.teachers(teacherDao: TeacherDao, uploadsDao: UploadsDao) {
 
     }
 
+    get<TeacherRequest.UploadNotes> {
+
+        if (uploadsDao.addUpload())
+            uploadsDao.getUploadFile(it.uploadID)
+    }
+
     post<TeacherRequest.UploadNotes> {
         val multipart = call.receiveMultipart()
         var uploadId: String? = null

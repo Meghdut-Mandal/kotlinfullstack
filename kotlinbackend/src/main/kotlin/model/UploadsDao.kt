@@ -8,6 +8,12 @@ import java.io.File
 interface UploadsDao {
 
     /*
+    Checks if the upload with the given ID exists
+     */
+    fun hasUpload(uploadId: String): Boolean
+
+
+    /*
     Get the path of the file stored in the temp dir
      */
     fun getUploadFile(uploadId: String): File
@@ -28,6 +34,10 @@ class UploadDaoImpl(val uploadDb: Nitrite, val hashFunc: (String) -> String, val
 
     val repository by lazy {
         uploadDb.getRepository(Upload::class.java)
+    }
+
+    override fun hasUpload(uploadId: String): Boolean {
+        return repository.find(Upload::id eq uploadId).any()
     }
 
     override fun getUploadFile(uploadId: String): File {

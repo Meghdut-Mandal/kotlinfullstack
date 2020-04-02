@@ -74,7 +74,7 @@ class TeacherRequest {
     class UploadID
 
     @Location("/upload/")
-    class UploadNotes
+    class UploadNotes(val uploadID: String = "")
 }
 
 
