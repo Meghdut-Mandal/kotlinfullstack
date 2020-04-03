@@ -4,6 +4,7 @@ import ImageConverter
 import TeacherRequest
 import TeacherRequest.SignUpPage
 import com.google.gson.Gson
+import dao.SubjectTaughtDao
 import dao.TeacherDao
 import hash
 import io.ktor.application.call
@@ -21,7 +22,9 @@ import io.ktor.thymeleaf.ThymeleafContent
 import model.*
 
 
-fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploadsDao: UploadsDao) {
+fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploadsDao: UploadsDao, subjectTaughtDao: SubjectTaughtDao) {
+    val stringResponseError = StringResponse(300, "Error in parameters")
+
     get<SignUpPage> {
         call.respond(ThymeleafContent("teacher_signup", mapOf()))
     }
@@ -48,22 +51,29 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
     get<TeacherRequest.Remove> {
         call.respond(ThymeleafContent("remove_teacher", mapOf()))
     }
+    post<TeacherRequest.Info> {
+        val post = call.receive<Parameters>()
+        val id = post["email"] ?: return@post call.respond(stringResponseError)
+        val teacher = teacherDao.getTeacher(id)
+                ?: return@post call.respond(stringResponseError.copy(message = "Invalid Email"))
+        call.respond(teacher.copy(hash = ""))
+    }
 
     post<TeacherRequest.UploadID> {
-
         val post = call.receive<Parameters>()
-        val message = StringResponse(300, "Error in parameters")
-        val teacherID = post["teacherid"] ?: return@post call.respond(message)
-        val taught = post["taughtby"] ?: return@post call.respond(message)
-        val chapterName = post["chaptername"] ?: return@post call.respond(message)
-        val taughtBy = Gson().fromJson(taught, SubjectTaught::class.java)
-                ?: return@post call.respond(message)
+        val teacherID = post["teacherid"] ?: return@post call.respond(stringResponseError)
+        val taught = post["taughtby"] ?: return@post call.respond(stringResponseError)
+        val chapterName = post["chaptername"] ?: return@post call.respond(stringResponseError)
+        val (id, batch, subjectName, subjectSlug) = Gson().fromJson(taught, SubjectTaught::class.java)
 
-        val upload = uploadsDao.addUpload(teacherID, taughtBy, chapterName)
+        val subjectID =
+                subjectTaughtDao.addSubject(batch, subjectName, subjectSlug)
+        teacherDao.addSubject(teacherID, subjectID)
+
+
+        val upload = uploadsDao.addUpload(teacherID, subjectID, chapterName)
 
         return@post call.respond(StringResponse(200, upload))
-
-
     }
 
     get<TeacherRequest.UploadNotes> {

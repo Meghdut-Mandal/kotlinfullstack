@@ -1,6 +1,5 @@
 package dao
 
-import model.SubjectTaught
 import model.Teacher
 import org.dizitart.kno2.filters.eq
 import org.dizitart.no2.Nitrite
@@ -10,7 +9,7 @@ interface TeacherDao {
 
     fun getTeacher(id: String): Teacher?
 
-    fun addSubject(teacherId: String, subjectTaught: SubjectTaught)
+    fun addSubject(teacherId: String, subjectTaughID: String)
 
     fun hasTeacher(id: String): Boolean
 }
@@ -34,10 +33,13 @@ class TeacherDaoImpl(val teacherDb: Nitrite) : TeacherDao {
         return repository.find(Teacher::id eq id).firstOrNull()
     }
 
-    override fun addSubject(teacherId: String, subjectTaught: SubjectTaught) {
+    override fun addSubject(teacherId: String, subjectTaughID: String) {
+        println("dao>TeacherDaoImpl>addSubject   ")
         getTeacher(teacherId)?.let {
-            it.subjects.add(subjectTaught)
-            repository.update(getTeacher(teacherId))
+            if (it.subjects.find { it == subjectTaughID } == null) {
+                it.subjects.add(subjectTaughID)
+                repository.update(it)
+            }
         }
     }
 

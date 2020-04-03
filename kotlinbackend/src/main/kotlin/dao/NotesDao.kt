@@ -2,7 +2,6 @@ package dao
 
 import gson
 import hash
-import model.SubjectTaught
 import model.notes.Note
 import model.notes.NotePage
 import model.quiz.essential.ChapterSnap
@@ -17,7 +16,7 @@ class NotesDao(notesDb: Nitrite, subjectData: Nitrite, val root: File) : Subject
         notesDb.getRepository(Note::class.java)
     }
 
-    fun addNote(subjectTaught: SubjectTaught, name: String, pagesList: List<NotePage>): Boolean {
+    fun addNote(subjectTaught: String, name: String, pagesList: List<NotePage>): Boolean {
         val hash = genHash(subjectTaught, name)
         if (!hasNote(hash)) {
             val note = Note(hash, name, pagesList, pagesList.size)
@@ -45,8 +44,8 @@ class NotesDao(notesDb: Nitrite, subjectData: Nitrite, val root: File) : Subject
     fun getNotesFolder(clazz: Int, subjectSnap: SubjectSnap, chapterSnap: ChapterSnap) =
             File(root, hash("$clazz/${subjectSnap.slug}/${chapterSnap.slug}"))
 
-    fun getNotesFolder(subjectTaught: SubjectTaught, chapterName: String) = File(root, genHash(subjectTaught, chapterName))
+    fun getNotesFolder(subjectTaught: String, chapterName: String) = File(root, genHash(subjectTaught, chapterName))
 
-    private fun genHash(subjectTaught: SubjectTaught, chapterName: String) =
+    private fun genHash(subjectTaught: String, chapterName: String) =
             hash(gson.toJson(subjectTaught) + chapterName)
 }

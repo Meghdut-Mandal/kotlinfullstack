@@ -35,6 +35,7 @@ import model.UploadDaoImpl
 import model.User
 import model.getErrorResponse
 import org.dizitart.kno2.nitrite
+import org.dizitart.no2.Nitrite
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import routes.*
 import java.io.File
@@ -72,6 +73,10 @@ class TeacherRequest {
 
     @Location("/login")
     class LogInRequest
+
+    @Location("/about/")
+    class Info
+
 
     @Location("/upload_id/")
     class UploadID
@@ -177,40 +182,26 @@ private val schoolsDao = SchoolListDAO(File("data/edugorrilas.db"))
  *
  * For more information about this file: https://ktor.io/servers/configuration.html#hocon-file
  */
-private val subjectsData = nitrite {
-    file = File("subjectsData.db")
-    compress = true
-    autoCompact = true
-}
-private val questionData = nitrite {
-    file = File("questionsData.db")
-    compress = true
-    autoCompact = true
-}
-private val attendanceData = nitrite {
-    file = File("data/attendance.db")
-    compress = true
-    autoCompact = true
-}
-private val teachersDao = nitrite {
-    file = File("data/teacher.db")
-    compress = true
-    autoCompact = true
-}
-private val uploadsData = nitrite {
-    file = File("data/uploads.db")
-    compress = true
-    autoCompact = true
-}
-private val notesData = nitrite {
-    file = File("data/notes.db")
-    compress = true
-    autoCompact = true
-}
-private val uploadsDao = UploadDaoImpl(uploadsData, { s -> hash(s) })
+private val subjectsData = getDb("subjectsData")
 
+private fun getDb(fileName: String): Nitrite = nitrite {
+    file = File("data/$fileName.db")
+    compress = true
+    autoCompact = true
+}
+
+private val questionData = getDb("questionsData")
+private val attendanceData = getDb("attendance")
+private val teachersDao = getDb("teacher")
+private val uploadsData = getDb("uploads")
+private val notesData = getDb("notes")
+private val subjectTaughtData = getDb("subjects_taught")
+
+private val subjectsTaughtDao = SubjectTaughtDaoImpl(subjectTaughtData)
+private val uploadsDao = UploadDaoImpl(uploadsData)
 private val attendanceDAO = AttendanceDAO(attendanceData)
 private val teacherDao: TeacherDao = TeacherDaoImpl(teachersDao)
+
 
 private val questionsDataBase = QuestionsDataBase(subjectsData, questionData)
 private val notesDao = NotesDao(notesData, subjectsData, File("notes"))
@@ -329,7 +320,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         quizLinks(questionsDataBase)
         notesLinks(notesDao)
         attandanceHelper(attendanceDAO)
-        teachers(imageConverter, teacherDao, uploadsDao)
+        teachers(imageConverter, teacherDao, uploadsDao, subjectsTaughtDao)
         static("styles") {
             resources("styles/")
         }
@@ -347,6 +338,10 @@ fun Application.mainWithDependencies(dao: ViveDao) {
     }
 }
 
+
+fun hash(vararg items: Any): String {
+    return hash(items.joinToString { gson.toJson(it) })
+}
 
 /**
  * Method that hashes a [password] by using the globally defined secret key [hmacKey].

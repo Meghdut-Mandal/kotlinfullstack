@@ -17,7 +17,7 @@ class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: N
         try {
             val upload = uploadsDao.getUpload(uploadId)
             val pdfFile = uploadsDao.getUploadFile(uploadId)
-            val outDir = notesDao.getNotesFolder(upload.subjectTaught, upload.chapterName)
+            val outDir = notesDao.getNotesFolder(upload.subjectTaughtID, upload.chapterName)
             outDir.mkdirs()
 
             val document: PDDocument = PDDocument.load(pdfFile)
@@ -48,7 +48,7 @@ class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: N
             }
             document.close()
             println(">ImageConverter>processUpload  Converted Images are saved at -> " + "${outDir.absolutePath} ")
-            notesDao.addNote(upload.subjectTaught, upload.chapterName, pageList)
+            notesDao.addNote(upload.subjectTaughtID, upload.chapterName, pageList)
             uploadsDao.updateStatus(uploadId, Upload.PROCESSED)
         }
         catch (e: Exception) {
