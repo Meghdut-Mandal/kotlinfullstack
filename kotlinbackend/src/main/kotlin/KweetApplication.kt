@@ -31,7 +31,6 @@ import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
 import io.ktor.thymeleaf.Thymeleaf
 import io.ktor.util.hex
-import model.UploadDaoImpl
 import model.User
 import model.getErrorResponse
 import org.dizitart.kno2.nitrite
@@ -63,8 +62,20 @@ class BootRequest
 @Location("/school/notices/delete")
 class DeleteNotices
 
+
+@Location("/student/")
+class StudentAPI {
+
+    @Location("/notes/")
+    class Notes(val subject_id: String)
+
+    @Location("/subjects/")
+    class Subjects
+}
+
+
 @Location("/teacher/")
-class TeacherRequest {
+class TeacherAPI {
     @Location("/register")
     class SignUpPage
 
@@ -323,6 +334,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         notesLinks(notesDao)
         attandanceHelper(attendanceDAO)
         teachers(imageConverter, teacherDao, uploadsDao, subjectsTaughtDao)
+        student(subjectsTaughtDao, notesDao)
         static("styles") {
             resources("styles/")
         }

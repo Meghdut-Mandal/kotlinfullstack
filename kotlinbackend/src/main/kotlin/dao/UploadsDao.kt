@@ -1,6 +1,7 @@
-package model
+package dao
 
 import hash
+import model.Upload
 import org.dizitart.kno2.filters.eq
 import org.dizitart.no2.Nitrite
 import java.io.File

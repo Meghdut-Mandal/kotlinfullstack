@@ -1,11 +1,12 @@
 package routes
 
 import ImageConverter
-import TeacherRequest
-import TeacherRequest.SignUpPage
+import TeacherAPI
+import TeacherAPI.SignUpPage
 import com.google.gson.Gson
 import dao.SubjectTaughtDao
 import dao.TeacherDao
+import dao.UploadsDao
 import hash
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -20,11 +21,14 @@ import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.thymeleaf.ThymeleafContent
-import model.*
+import model.StringResponse
+import model.SubjectTaught
+import model.Teacher
+import model.Upload
 
+val stringResponseError = StringResponse(300, "Error in parameters")
 
 fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploadsDao: UploadsDao, subjectTaughtDao: SubjectTaughtDao) {
-    val stringResponseError = StringResponse(300, "Error in parameters")
 
     get<SignUpPage> {
         call.respond(ThymeleafContent("teacher_signup", mapOf()))
@@ -49,17 +53,17 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
         }
     }
 
-    post<TeacherRequest.Uploads> {
+    post<TeacherAPI.Uploads> {
         val post = call.receive<Parameters>()
         val id = post["email"] ?: return@post call.respond(stringResponseError)
         val uploads = uploadsDao.getUploads(id)
         call.respond(HttpStatusCode.OK, uploads)
     }
 
-    get<TeacherRequest.Remove> {
+    get<TeacherAPI.Remove> {
         call.respond(ThymeleafContent("remove_teacher", mapOf()))
     }
-    post<TeacherRequest.Info> {
+    post<TeacherAPI.Info> {
         val post = call.receive<Parameters>()
         val id = post["email"] ?: return@post call.respond(stringResponseError)
         val teacher = teacherDao.getTeacher(id)
@@ -67,7 +71,7 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
         call.respond(teacher.copy(hash = ""))
     }
 
-    post<TeacherRequest.UploadID> {
+    post<TeacherAPI.UploadID> {
         val post = call.receive<Parameters>()
         val teacherID = post["teacherid"] ?: return@post call.respond(stringResponseError)
         val taught = post["taughtby"] ?: return@post call.respond(stringResponseError)
@@ -84,7 +88,7 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
         return@post call.respond(StringResponse(200, upload))
     }
 
-    get<TeacherRequest.UploadNotes> {
+    get<TeacherAPI.UploadNotes> {
         println("routes>>teachers   ")
         if (uploadsDao.hasUpload(it.upload_id)) {
             val upload = uploadsDao.getUpload(it.upload_id)
@@ -92,7 +96,7 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
         } else return@get call.respond(StringResponse(300, "Invaid Upload ID"))
     }
 
-    post<TeacherRequest.UploadNotes> {
+    post<TeacherAPI.UploadNotes> {
         val multipart = call.receiveMultipart()
         var uploadId: String? = null
         var filePart: PartData.FileItem? = null

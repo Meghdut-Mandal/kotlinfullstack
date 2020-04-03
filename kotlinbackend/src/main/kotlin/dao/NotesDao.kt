@@ -16,10 +16,10 @@ class NotesDao(notesDb: Nitrite, subjectData: Nitrite, val root: File) : Subject
         notesDb.getRepository(Note::class.java)
     }
 
-    fun addNote(subjectTaught: String, name: String, pagesList: List<NotePage>): Boolean {
-        val hash = genHash(subjectTaught, name)
+    fun addNote(subjectTaughtID: String, name: String, pagesList: List<NotePage>): Boolean {
+        val hash = genHash(subjectTaughtID, name)
         if (!hasNote(hash)) {
-            val note = Note(hash, name, pagesList, pagesList.size)
+            val note = Note(hash, subjectTaughtID, name, pagesList, pagesList.size)
             repository.insert(note)
             return true
         }
@@ -37,8 +37,13 @@ class NotesDao(notesDb: Nitrite, subjectData: Nitrite, val root: File) : Subject
         val notePages =
                 imageList.mapIndexed { index, file -> NotePage(index, "Page $index", file.name) }
         val note =
-                Note(hash("" + Math.random()), "Class $clazz ${subjectSnap.name} - ${chapterSnap.name}", notePages, notePages.size)
+                Note(hash("" + Math.random()), subjectSnap.id.toString(), "Class $clazz ${subjectSnap.name} - ${chapterSnap.name}", notePages, notePages.size)
         return note
+    }
+
+    fun getNotes(subjectTaughtID: String): List<Note> {
+        println("dao>NotesDao>getNotes   ")
+        return repository.find().filter { it.subjectTaughtID == subjectTaughtID }.toList()
     }
 
     fun getNotesFolder(clazz: Int, subjectSnap: SubjectSnap, chapterSnap: ChapterSnap) =

@@ -33,7 +33,7 @@ class SubjectTaughtDaoImpl(val subjectsDb: Nitrite) : SubjectTaughtDao {
     }
 
     override fun getSubjects(batch: Batch): List<SubjectTaught> {
-        return repository.find(SubjectTaught::batch eq batch).toList()
+        return repository.find().filter { it.batch == batch }.toList()
     }
 
     override fun addSubject(batch: Batch, subjectName: String, subjectSlug: String): String {
