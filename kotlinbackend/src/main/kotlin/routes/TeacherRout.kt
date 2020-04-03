@@ -8,6 +8,7 @@ import dao.SubjectTaughtDao
 import dao.TeacherDao
 import hash
 import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
@@ -46,6 +47,13 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
                 call.respond(ThymeleafContent("registration_sucesspage", mapOf()))
             else call.respond("Some internal error is there !")
         }
+    }
+
+    post<TeacherRequest.Uploads> {
+        val post = call.receive<Parameters>()
+        val id = post["email"] ?: return@post call.respond(stringResponseError)
+        val uploads = uploadsDao.getUploads(id)
+        call.respond(HttpStatusCode.OK, uploads)
     }
 
     get<TeacherRequest.Remove> {

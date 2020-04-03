@@ -77,6 +77,8 @@ class TeacherRequest {
     @Location("/about/")
     class Info
 
+    @Location("/uploads/")
+    class Uploads
 
     @Location("/upload_id/")
     class UploadID
