@@ -1,7 +1,6 @@
 import dao.NotesDao
 import dao.UploadsDao
 import model.Upload
-import model.notes.NotePage
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.rendering.ImageType
 import org.apache.pdfbox.rendering.PDFRenderer
@@ -32,7 +31,6 @@ class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: N
 
             val dpi = 150
             // use less dpi for to save more space in harddisk. For professional usage you can use more than 300dpi
-            val pageList = arrayListOf<NotePage>()
             for (i in 0 until numberOfPages) {
                 val outPutFile =
                         File(outDir, "p$i.$fileExtension")
@@ -41,14 +39,13 @@ class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: N
                 outPutFile.outputStream().use { fileOutputStream: FileOutputStream ->
                     //                    XZOutputStream(fileOutputStream, LZMA2Options(8)).use { xzStream ->
                     ImageIO.write(bImage, fileExtension, fileOutputStream)
-                    pageList.add(NotePage(i, "pg$i", "/notes/${outDir.name}/${outPutFile.name}"))
 //                    }
                 }
 
             }
             document.close()
             println(">ImageConverter>processUpload  Converted Images are saved at -> " + "${outDir.absolutePath} ")
-            notesDao.addNote(upload.subjectTaughtID, upload.chapterName, pageList)
+            notesDao.addNote(upload.subjectTaughtID, upload.chapterName, numberOfPages)
             uploadsDao.updateStatus(uploadId, Upload.PROCESSED)
         }
         catch (e: Exception) {

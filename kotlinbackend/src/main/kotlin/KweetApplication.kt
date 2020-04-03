@@ -73,6 +73,8 @@ class StudentAPI {
     class Subjects
 }
 
+@Location("/notes/{id}/{pageno}")
+class NotePageRequest(val id: String, val pageno: Int)
 
 @Location("/teacher/")
 class TeacherAPI {
@@ -133,7 +135,7 @@ class ChaptersRequest(val clazz: Int, val subject: String)
 @Location("quiz/questions")
 class QuestionRequests(val clazz: Int, val subject: String, val chapter: String, val skip: Int = 0)
 
-@Location("note/")
+@Location("noted/")
 class NoteRequest(val clazz: Int, val subject: String, val chapter: String)
 
 @Location("note/file")
@@ -345,9 +347,8 @@ fun Application.mainWithDependencies(dao: ViveDao) {
             resources("templates/sample_site")
             resource("/home", "templates/sample_site/home.html")
         }
-        static("notes") {
-            resources("templates/notes/")
-        }
+
+
         carrerLibrary(dao, hashFunction)
     }
 }
