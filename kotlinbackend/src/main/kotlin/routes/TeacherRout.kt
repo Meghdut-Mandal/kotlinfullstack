@@ -30,6 +30,17 @@ val stringResponseError = StringResponse(300, "Error in parameters")
 
 fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploadsDao: UploadsDao, subjectTaughtDao: SubjectTaughtDao) {
 
+    post<TeacherAPI.LogInRequest> {
+        val post = call.receive<Parameters>()
+
+        val email = post["email"]
+                ?: return@post call.respond(ThymeleafContent("teacher_signup", mapOf("error" to "The Email Should not be empty")))
+        val password = post["psw"]
+                ?: return@post call.respond(ThymeleafContent("teacher_signup", mapOf("error" to "The Password Should not be empty")))
+
+    }
+
+
     get<SignUpPage> {
         call.respond(ThymeleafContent("teacher_signup", mapOf()))
     }
@@ -45,7 +56,7 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
             return@post call.respond(ThymeleafContent("teacher_signup", mapOf("error" to "The email has been already used. Try some other Email.")))
         } else {
             val teacher =
-                    Teacher(userEmail, hash(userEmail + userPassword), userName, arrayListOf())
+                    Teacher(userEmail, hash(userEmail, userPassword), userName, arrayListOf())
             val sucess = teacherDao.addTeacher(teacher)
             if (sucess)
                 call.respond(ThymeleafContent("registration_sucesspage", mapOf()))

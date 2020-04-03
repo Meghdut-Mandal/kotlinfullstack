@@ -361,7 +361,7 @@ fun hash(vararg items: Any): String {
 /**
  * Method that hashes a [password] by using the globally defined secret key [hmacKey].
  */
-fun hash(string: String): String {
+private fun hash(string: String): String {
     val digester = MessageDigest.getInstance("MD5")
     val bytes = digester.digest(string.toByteArray())
     val bigno = BigInteger(1, bytes)

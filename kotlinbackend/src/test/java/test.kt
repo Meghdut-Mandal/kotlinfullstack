@@ -4,7 +4,7 @@ import model.SubjectTaught
 import okhttp3.*
 
 
-val parent = "http://localhost:8085"
+val parent = "http://13.251.36.49:8080"
 val client = OkHttpClient().newBuilder()
         .build()
 
@@ -44,7 +44,7 @@ fun upload_create(email: String, subjectTaught: SubjectTaught, chapterName: Stri
 
 fun main() {
     val email = "meghdut.windows@gmail.com"
-    register_user(email)
+//    register_user(email)
     val chapters = listOf("chapter 1 ", "chapter 2", "chpter 3", "chapter 5")
     listOf("physics", "chemistry", "hindi", "bengali", "geography").forEach { subject ->
         val subjectTaught = SubjectTaught("edds", Batch(12, "D"), subject, "id$subject")

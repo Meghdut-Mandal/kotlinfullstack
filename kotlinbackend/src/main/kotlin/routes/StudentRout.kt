@@ -30,6 +30,7 @@ fun Route.student(subjectTaughtDao: SubjectTaughtDao, notesDao: NotesDao) {
         call.respond(notes)
     }
 
+
     get<NotePageRequest> {
         val file = File("notes/${it.id}", "p${it.pageno}.jpg")
         if (file.exists())

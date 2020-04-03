@@ -1,6 +1,5 @@
 package dao
 
-import gson
 import hash
 import model.notes.Note
 import model.notes.NotePage
@@ -37,7 +36,7 @@ class NotesDao(notesDb: Nitrite, subjectData: Nitrite, val root: File) : Subject
         val notePages =
                 imageList.mapIndexed { index, file -> NotePage(index, "Page $index", file.name) }
         val note =
-                Note(hash("" + Math.random()), subjectSnap.id.toString(), "Class $clazz ${subjectSnap.name} - ${chapterSnap.name}", notePages.size)
+                Note(hash(Math.random()), subjectSnap.id.toString(), "Class $clazz ${subjectSnap.name} - ${chapterSnap.name}", notePages.size)
         return note
     }
 
@@ -47,10 +46,10 @@ class NotesDao(notesDb: Nitrite, subjectData: Nitrite, val root: File) : Subject
     }
 
     fun getNotesFolder(clazz: Int, subjectSnap: SubjectSnap, chapterSnap: ChapterSnap) =
-            File(root, hash("$clazz/${subjectSnap.slug}/${chapterSnap.slug}"))
+            File(root, hash(clazz, subjectSnap.slug, chapterSnap.slug))
 
     fun getNotesFolder(subjectTaught: String, chapterName: String) = File(root, genHash(subjectTaught, chapterName))
 
     private fun genHash(subjectTaught: String, chapterName: String) =
-            hash(gson.toJson(subjectTaught) + chapterName)
+            hash(subjectTaught, chapterName)
 }
