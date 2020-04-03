@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import dao.SubjectTaughtDao
 import dao.TeacherDao
 import dao.UploadsDao
+import gson
 import hash
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -42,7 +43,7 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
                 ?: return@post call.respond(StringResponse(1, "Teacher not found"))
         val calculated = hash(email, password)
         if (teacher.hash == calculated)
-            return@post call.respond(StringResponse(0, calculated))
+            return@post call.respond(StringResponse(0, gson.toJson(teacher)))
         else return@post call.respond(StringResponse(2, "Incorrect Password"))
 
     }
