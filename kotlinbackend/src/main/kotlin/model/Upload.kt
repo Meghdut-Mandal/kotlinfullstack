@@ -2,7 +2,7 @@ package model
 
 import org.dizitart.no2.objects.Id
 
-data class Upload(@Id val id: String, val teacherID: String, val subjectTaughtID: String, val chapterName: String, val status: String) {
+data class Upload(@Id val id: String, val teacherID: String, val subjectTaughtID: String, val chapterName: String, val status: String, val timeStamp: Long = System.currentTimeMillis()) {
     companion object {
         const val RECEIVED = "received"
         const val PROCESSED = "processed"

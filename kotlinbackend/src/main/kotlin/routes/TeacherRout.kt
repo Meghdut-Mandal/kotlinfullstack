@@ -38,6 +38,13 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
         val password = post["psw"]
                 ?: return@post call.respond(ThymeleafContent("teacher_signup", mapOf("error" to "The Password Should not be empty")))
 
+        val teacher = teacherDao.getTeacher(email)
+                ?: return@post call.respond(StringResponse(1, "Teacher not found"))
+        val calculated = hash(email, password)
+        if (teacher.hash == calculated)
+            return@post call.respond(StringResponse(0, calculated))
+        else return@post call.respond(StringResponse(2, "Incorrect Password"))
+
     }
 
 
