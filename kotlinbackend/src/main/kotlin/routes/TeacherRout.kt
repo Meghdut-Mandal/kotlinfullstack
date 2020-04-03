@@ -1,5 +1,6 @@
 package routes
 
+import ImageConverter
 import TeacherRequest
 import TeacherRequest.SignUpPage
 import com.google.gson.Gson
@@ -17,26 +18,10 @@ import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.thymeleaf.ThymeleafContent
-import model.StringResponse
-import model.SubjectTaught
-import model.Teacher
-import model.UploadsDao
+import model.*
 
 
-/*
-@Location("/teacher/")
-class TeacherRequest
-{
-    @Location("/register")
-    class SignUpPage
-
-    @Location("/login")
-    class LogInRequest
-}
- */
-
-
-fun Route.teachers(teacherDao: TeacherDao, uploadsDao: UploadsDao) {
+fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploadsDao: UploadsDao) {
     get<SignUpPage> {
         call.respond(ThymeleafContent("teacher_signup", mapOf()))
     }
@@ -60,8 +45,9 @@ fun Route.teachers(teacherDao: TeacherDao, uploadsDao: UploadsDao) {
         }
     }
 
-
-
+    get<TeacherRequest.Remove> {
+        call.respond(ThymeleafContent("remove_teacher", mapOf()))
+    }
 
     post<TeacherRequest.UploadID> {
 
@@ -81,6 +67,7 @@ fun Route.teachers(teacherDao: TeacherDao, uploadsDao: UploadsDao) {
     }
 
     get<TeacherRequest.UploadNotes> {
+        println("routes>>teachers   ")
         if (uploadsDao.hasUpload(it.upload_id)) {
             val upload = uploadsDao.getUpload(it.upload_id)
             return@get call.respond(upload)
@@ -100,12 +87,18 @@ fun Route.teachers(teacherDao: TeacherDao, uploadsDao: UploadsDao) {
 
         }
         if (uploadId != null) {
-            val file = uploadsDao.getUploadFile(uploadId!!)
+            val uploadId1 = uploadId!!
+            val file = uploadsDao.getUploadFile(uploadId1)
             filePart!!.streamProvider().use { its ->
                 // copy the stream to the file with buffering
                 file.outputStream().buffered().use {
                     // note that this is blocking
                     its.copyTo(it)
+                    println("routes>>teachers   ")
+                    uploadsDao.updateStatus(uploadId1, Upload.RECEIVED)
+                    Thread {
+                        imageConverter.processUpload(uploadId1)
+                    }.start()
                     return@post call.respond(StringResponse(200, "Successfully uploaded "))
                 }
             }
@@ -115,7 +108,6 @@ fun Route.teachers(teacherDao: TeacherDao, uploadsDao: UploadsDao) {
         }
         multipart.forEachPart { part ->
             // make sure to dispose of the part after use to prevent leaks
-
             part.dispose()
         }
 

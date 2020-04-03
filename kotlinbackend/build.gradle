@@ -37,6 +37,10 @@ dependencies {
     compile "io.ktor:ktor-freemarker:1.3.0-rc"
     compile "io.ktor:ktor-html-builder:1.3.0-rc"
     compile "io.ktor:ktor-client-apache:1.3.0-rc"
+    compile "org.apache.pdfbox:pdfbox:2.0.19"
+    compile group: 'org.tukaani', name: 'xz', version: '1.8'
+
+
 
     compile "io.ktor:ktor-locations:1.3.0-rc"
     testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.3.0-alpha5'

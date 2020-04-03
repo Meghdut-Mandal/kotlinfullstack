@@ -17,7 +17,7 @@ fun Route.notesLinks(notesDao: NotesDao) {
         val subjectSnap = notesDao.getSubject(noteRequest.clazz, noteRequest.subject)
         val chapterSnap =
                 notesDao.getChapter(noteRequest.clazz, subjectSnap, noteRequest.chapter)
-        val notes = notesDao.getNotes(noteRequest.clazz, subjectSnap, chapterSnap)
+        val notes = notesDao.getNote(noteRequest.clazz, subjectSnap, chapterSnap)
         call.respond(notes)
     }
 

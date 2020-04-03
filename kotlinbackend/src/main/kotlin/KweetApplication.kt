@@ -38,11 +38,11 @@ import org.dizitart.kno2.nitrite
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import routes.*
 import java.io.File
+import java.math.BigInteger
 import java.net.URI
 import java.security.MessageDigest
 import java.text.DateFormat
 import java.time.Duration
-import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.crypto.spec.SecretKeySpec
 
@@ -66,6 +66,9 @@ class DeleteNotices
 class TeacherRequest {
     @Location("/register")
     class SignUpPage
+
+    @Location("/remove/")
+    class Remove
 
     @Location("/login")
     class LogInRequest
@@ -174,7 +177,6 @@ private val schoolsDao = SchoolListDAO(File("data/edugorrilas.db"))
  *
  * For more information about this file: https://ktor.io/servers/configuration.html#hocon-file
  */
-
 private val subjectsData = nitrite {
     file = File("subjectsData.db")
     compress = true
@@ -200,18 +202,25 @@ private val uploadsData = nitrite {
     compress = true
     autoCompact = true
 }
+private val notesData = nitrite {
+    file = File("data/notes.db")
+    compress = true
+    autoCompact = true
+}
 private val uploadsDao = UploadDaoImpl(uploadsData, { s -> hash(s) })
 
 private val attendanceDAO = AttendanceDAO(attendanceData)
 private val teacherDao: TeacherDao = TeacherDaoImpl(teachersDao)
 
 private val questionsDataBase = QuestionsDataBase(subjectsData, questionData)
-private val notesDao = NotesDao(subjectsData, File("notes"))
+private val notesDao = NotesDao(notesData, subjectsData, File("notes"))
 
 fun main() {
     embeddedServer(Netty, port, module = Application::main).start()
     println(">>main  Running at http://localhost:$port/ ")
 }
+
+private val imageConverter by lazy { ImageConverter(uploadsDao, notesDao) }
 
 
 @KtorExperimentalLocationsAPI
@@ -320,7 +329,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         quizLinks(questionsDataBase)
         notesLinks(notesDao)
         attandanceHelper(attendanceDAO)
-        teachers(teacherDao, uploadsDao)
+        teachers(imageConverter, teacherDao, uploadsDao)
         static("styles") {
             resources("styles/")
         }
@@ -338,14 +347,15 @@ fun Application.mainWithDependencies(dao: ViveDao) {
     }
 }
 
+
 /**
  * Method that hashes a [password] by using the globally defined secret key [hmacKey].
  */
 fun hash(string: String): String {
-    val data = string.toByteArray()
-    val digester = MessageDigest.getInstance("SHA-256")
-    digester.update(data)
-    return Base64.getEncoder().encodeToString(digester.digest())
+    val digester = MessageDigest.getInstance("MD5")
+    val bytes = digester.digest(string.toByteArray())
+    val bigno = BigInteger(1, bytes)
+    return bigno.toString(36)
 }
 
 /**

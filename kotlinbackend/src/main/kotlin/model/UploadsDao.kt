@@ -6,6 +6,10 @@ import org.dizitart.no2.Nitrite
 import java.io.File
 
 interface UploadsDao {
+    /*
+     update the status of upload of the file
+     */
+    fun updateStatus(uploadId: String, newStatus: String)
 
     /*
     Checks if the upload with the given ID exists
@@ -40,7 +44,13 @@ class UploadDaoImpl(val uploadDb: Nitrite, val hashFunc: (String) -> String, val
         uploadDb.getRepository(Upload::class.java)
     }
 
+    override fun updateStatus(uploadId: String, newStatus: String) {
+        val upload = getUpload(uploadId)
+        repository.update(upload.copy(status = newStatus))
+    }
+
     override fun hasUpload(uploadId: String): Boolean {
+        println("model>UploadDaoImpl>hasUpload   ")
         return repository.find(Upload::id eq uploadId).any()
     }
 
