@@ -25,6 +25,7 @@ import io.ktor.thymeleaf.ThymeleafContent
 import model.StringResponse
 import model.SubjectTaught
 import model.Teacher
+import model.Upload
 
 val stringResponseError = StringResponse(300, "Error in parameters")
 
@@ -46,7 +47,6 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
         else return@post call.respond(StringResponse(2, "Incorrect Password"))
 
     }
-    ///  attendance.db  data.db  dummy  edugorrilas.db  notes.db  questionsData.db  subjectsData.db  subjects_taught.db  teacher.db  uploads.db
 
 
     get<SignUpPage> {
@@ -129,19 +129,21 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
         }
         if (uploadId != null) {
             val uploadId1 = uploadId!!
-            uploadsDao.hasUpload(uploadId1)
-            if (uploadsDao.hasUpload(uploadId1)) {
-                val file = uploadsDao.getUploadFile(uploadId1)
-                filePart!!.streamProvider().use { inputStream ->
-                    // copy the stream to the file with buffering
-                    file.outputStream().buffered().use { outputStream ->
-                        // note that this is blocking
-                        inputStream.copyTo(outputStream)
+            val file = uploadsDao.getUploadFile(uploadId1)
+            filePart!!.streamProvider().use { its ->
+                // copy the stream to the file with buffering
+                file.outputStream().buffered().use {
+                    // note that this is blocking
+                    its.copyTo(it)
+                    println("routes>>teachers   ")
+                    uploadsDao.updateStatus(uploadId1, Upload.RECEIVED)
+                    Thread {
                         imageConverter.processUpload(uploadId1)
-                        return@post call.respond(StringResponse(200, "Successfully uploaded "))
-                    }
+                    }.start()
+                    return@post call.respond(StringResponse(200, "Successfully uploaded "))
                 }
-            } else return@post call.respond(StringResponse(300, "Upload not registered "))
+            }
+            return@post call.respond(StringResponse(300, "Error in upload"))
         } else {
             call.respond(StringResponse(300, "Error in upload"))
         }
