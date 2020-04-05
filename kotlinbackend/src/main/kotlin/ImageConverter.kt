@@ -6,13 +6,15 @@ import org.apache.pdfbox.rendering.ImageType
 import org.apache.pdfbox.rendering.PDFRenderer
 import java.io.File
 import java.io.FileOutputStream
+import java.util.concurrent.Executors
 import javax.imageio.ImageIO
 
 
 class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: NotesDao) {
+    private val executor = Executors.newFixedThreadPool(10)
 
-
-    fun processUpload(uploadId: String) {
+    fun processUpload(uploadId: String) = executor.submit {
+        uploadsDao.updateStatus(uploadId, Upload.RECEIVED)
         try {
             val upload = uploadsDao.getUpload(uploadId)
             val pdfFile = uploadsDao.getUploadFile(uploadId)

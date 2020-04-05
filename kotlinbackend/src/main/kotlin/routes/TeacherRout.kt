@@ -25,7 +25,6 @@ import io.ktor.thymeleaf.ThymeleafContent
 import model.StringResponse
 import model.SubjectTaught
 import model.Teacher
-import model.Upload
 
 val stringResponseError = StringResponse(300, "Error in parameters")
 
@@ -133,17 +132,13 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
             uploadsDao.hasUpload(uploadId1)
             if (uploadsDao.hasUpload(uploadId1)) {
                 val file = uploadsDao.getUploadFile(uploadId1)
-                filePart!!.streamProvider().use { its ->
+                filePart!!.streamProvider().use { inputStream ->
                     // copy the stream to the file with buffering
-                    file.outputStream().buffered().use {
+                    file.outputStream().buffered().use { outputStream ->
                         // note that this is blocking
-                        its.copyTo(it)
-                        call.respond(StringResponse(200, "Successfully uploaded "))
-                        uploadsDao.updateStatus(uploadId1, Upload.RECEIVED)
-                        Thread {
-                            imageConverter.processUpload(uploadId1)
-                        }.start()
-                        return@post
+                        inputStream.copyTo(outputStream)
+                        imageConverter.processUpload(uploadId1)
+                        return@post call.respond(StringResponse(200, "Successfully uploaded "))
                     }
                 }
             } else return@post call.respond(StringResponse(300, "Upload not registered "))
