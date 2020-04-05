@@ -22,10 +22,16 @@ import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.thymeleaf.ThymeleafContent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import model.StringResponse
 import model.SubjectTaught
 import model.Teacher
 import model.Upload
+import java.io.InputStream
+import java.io.OutputStream
 
 val stringResponseError = StringResponse(300, "Error in parameters")
 
@@ -117,41 +123,51 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
 
     post<TeacherAPI.UploadNotes> {
         val multipart = call.receiveMultipart()
-        var uploadId: String? = null
-        var filePart: PartData.FileItem? = null
+        val uploadId: String = it.upload_id
+        if (!uploadsDao.hasUpload(uploadId))
+            return@post call.respond(StringResponse(300, "Invalid Upload Id"))
+        val file = uploadsDao.getUploadFile(uploadId)
+        file.delete()
         multipart.forEachPart { part ->
-            // if part is a file (could be form item)
             if (part is PartData.FileItem) {
-                filePart = part
-            } else if (part is PartData.FormItem)
-                uploadId = part.value
-
-        }
-        if (uploadId != null) {
-            val uploadId1 = uploadId!!
-            val file = uploadsDao.getUploadFile(uploadId1)
-            filePart!!.streamProvider().use { its ->
-                // copy the stream to the file with buffering
-                file.outputStream().buffered().use {
-                    // note that this is blocking
-                    its.copyTo(it)
-                    println("routes>>teachers   ")
-                    uploadsDao.updateStatus(uploadId1, Upload.RECEIVED)
-                    Thread {
-                        imageConverter.processUpload(uploadId1)
-                    }.start()
-                    return@post call.respond(StringResponse(200, "Successfully uploaded "))
+                part.streamProvider().use { its ->
+                    // copy the stream to the file with buffering
+                    file.outputStream().buffered().use {
+                        // note that this is blocking
+                        its.copyToSuspend(it)
+                        println("routes>>teachers   ")
+                        uploadsDao.updateStatus(uploadId, Upload.RECEIVED)
+                        imageConverter.processUpload(uploadId)
+                    }
                 }
             }
-            return@post call.respond(StringResponse(300, "Error in upload"))
-        } else {
-            call.respond(StringResponse(300, "Error in upload"))
-        }
-        multipart.forEachPart { part ->
-            // make sure to dispose of the part after use to prevent leaks
             part.dispose()
         }
 
+        return@post call.respond(StringResponse(200, "Successfully uploaded "))
+    }
+}
 
+suspend fun InputStream.copyToSuspend(
+        out: OutputStream,
+        bufferSize: Int = DEFAULT_BUFFER_SIZE,
+        yieldSize: Int = 4 * 1024 * 1024,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
+): Long {
+    return withContext(dispatcher) {
+        val buffer = ByteArray(bufferSize)
+        var bytesCopied = 0L
+        var bytesAfterYield = 0L
+        while (true) {
+            val bytes = read(buffer).takeIf { it >= 0 } ?: break
+            out.write(buffer, 0, bytes)
+            if (bytesAfterYield >= yieldSize) {
+                yield()
+                bytesAfterYield %= yieldSize
+            }
+            bytesCopied += bytes
+            bytesAfterYield += bytes
+        }
+        return@withContext bytesCopied
     }
 }

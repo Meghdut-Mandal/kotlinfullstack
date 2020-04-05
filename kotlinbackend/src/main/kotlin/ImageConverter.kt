@@ -11,7 +11,7 @@ import javax.imageio.ImageIO
 
 
 class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: NotesDao) {
-    private val executor = Executors.newFixedThreadPool(10)
+    private val executor = Executors.newFixedThreadPool(3)
 
     fun processUpload(uploadId: String) = executor.submit {
         uploadsDao.updateStatus(uploadId, Upload.RECEIVED)

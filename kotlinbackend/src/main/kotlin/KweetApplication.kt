@@ -96,8 +96,8 @@ class TeacherAPI {
     @Location("/upload_id/")
     class UploadID
 
-    @Location("/upload/")
-    class UploadNotes(val upload_id: String = "")
+    @Location("/upload/{upload_id}")
+    class UploadNotes(val upload_id: String)
 }
 
 
@@ -247,6 +247,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
     // This adds automatically Date and Server headers to each response, and would allow you to configure
     // additional headers served to each response.
     install(CORS)
+
     {
         method(HttpMethod.Options)
         method(HttpMethod.Get)
@@ -262,6 +263,8 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         maxAge = Duration.ofDays(1)
         header("key")
     }
+    install(CallLogging)
+
 //    println(">>mainWithDependencies   ")
     install(DefaultHeaders)
 
@@ -283,7 +286,6 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         }
     }
     // This uses use the logger to log every call (request/response)
-    install(CallLogging)
     // Automatic '304 Not Modified' Responses
     install(ConditionalHeaders)
     // Supports for Range, Accept-Range and Content-Range headers

@@ -16,3 +16,4 @@ kotlinfrontend/web
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+/kotlinbackend/src/test/java/test.kt
