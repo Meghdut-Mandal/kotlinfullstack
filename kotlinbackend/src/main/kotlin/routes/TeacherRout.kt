@@ -47,6 +47,7 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
         else return@post call.respond(StringResponse(2, "Incorrect Password"))
 
     }
+    ///  attendance.db  data.db  dummy  edugorrilas.db  notes.db  questionsData.db  subjectsData.db  subjects_taught.db  teacher.db  uploads.db
 
 
     get<SignUpPage> {
@@ -129,21 +130,23 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
         }
         if (uploadId != null) {
             val uploadId1 = uploadId!!
-            val file = uploadsDao.getUploadFile(uploadId1)
-            filePart!!.streamProvider().use { its ->
-                // copy the stream to the file with buffering
-                file.outputStream().buffered().use {
-                    // note that this is blocking
-                    its.copyTo(it)
-                    println("routes>>teachers   ")
-                    uploadsDao.updateStatus(uploadId1, Upload.RECEIVED)
-                    Thread {
-                        imageConverter.processUpload(uploadId1)
-                    }.start()
-                    return@post call.respond(StringResponse(200, "Successfully uploaded "))
+            uploadsDao.hasUpload(uploadId1)
+            if (uploadsDao.hasUpload(uploadId1)) {
+                val file = uploadsDao.getUploadFile(uploadId1)
+                filePart!!.streamProvider().use { its ->
+                    // copy the stream to the file with buffering
+                    file.outputStream().buffered().use {
+                        // note that this is blocking
+                        its.copyTo(it)
+                        call.respond(StringResponse(200, "Successfully uploaded "))
+                        uploadsDao.updateStatus(uploadId1, Upload.RECEIVED)
+                        Thread {
+                            imageConverter.processUpload(uploadId1)
+                        }.start()
+                        return@post
+                    }
                 }
-            }
-            return@post call.respond(StringResponse(300, "Error in upload"))
+            } else return@post call.respond(StringResponse(300, "Upload not registered "))
         } else {
             call.respond(StringResponse(300, "Error in upload"))
         }
