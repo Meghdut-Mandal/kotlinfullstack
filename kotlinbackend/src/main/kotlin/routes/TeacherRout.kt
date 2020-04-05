@@ -126,25 +126,31 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
         val uploadId: String = it.upload_id
         if (!uploadsDao.hasUpload(uploadId))
             return@post call.respond(StringResponse(300, "Invalid Upload Id"))
+        println("routes>>teachers  Upload id ${it.upload_id} ")
         val file = uploadsDao.getUploadFile(uploadId)
         file.delete()
         multipart.forEachPart { part ->
             if (part is PartData.FileItem) {
                 part.streamProvider().use { its ->
+                    println("routes>>teachers  stream file started  ")
                     // copy the stream to the file with buffering
                     file.outputStream().buffered().use {
                         // note that this is blocking
-                        its.copyToSuspend(it)
-                        println("routes>>teachers   ")
+                        call.respond(StringResponse(200, "Successfully uploaded "))
+                        its.copyTo(it)
+                        println("routes>>teachers stream complete ")
                         uploadsDao.updateStatus(uploadId, Upload.RECEIVED)
                         imageConverter.processUpload(uploadId)
+                        println("routes>>teachers conversion launched  ")
+
                     }
                 }
             }
             part.dispose()
+            println("routes>>teachers  Part disposed  ")
         }
+        println("routes>>teachers  reponding back ")
 
-        return@post call.respond(StringResponse(200, "Successfully uploaded "))
     }
 }
 

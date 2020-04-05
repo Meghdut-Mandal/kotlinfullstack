@@ -1,10 +1,12 @@
 import com.google.gson.Gson
 import model.Batch
+import model.StringResponse
 import model.SubjectTaught
 import okhttp3.*
+import java.io.File
 
 
-val parent = "http://13.251.36.49:8080"
+val parent = "http://localhost:8085"
 val client = OkHttpClient().newBuilder()
         .build()
 
@@ -27,7 +29,7 @@ fun register_user(email: String) {
     else println(">>register_user  Not sucessfull ")
 }
 
-fun upload_create(email: String, subjectTaught: SubjectTaught, chapterName: String) {
+fun upload_create(email: String, subjectTaught: SubjectTaught, chapterName: String): String {
     val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
             .addFormDataPart("teacherid", email)
             .addFormDataPart("taughtby", Gson().toJson(subjectTaught))
@@ -39,7 +41,25 @@ fun upload_create(email: String, subjectTaught: SubjectTaught, chapterName: Stri
             .addHeader("Content-Type", "multipart/form-data;")
             .build()
     val response = client.newCall(request).execute()
-    println(">>upload_create  ${response.body()?.string()} ")
+    val fromJson = Gson().fromJson(response.body()?.string(), StringResponse::class.java)
+    return fromJson.message
+}
+
+fun uploadFile(file: File, id: String) {
+
+    val countingRequestBody =
+            CountingRequestBody(RequestBody.create(MediaType.parse("application/octet-stream"), file)) { bytesWritten, totalLength ->
+                println(">>uploadFile  progress ${(bytesWritten * 100) / totalLength} ")
+            }
+    val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("abcd", file.absolutePath, countingRequestBody)
+            .build()
+    val request: Request = Request.Builder()
+            .url("$parent/teacher/upload/$id")
+            .method("POST", body)
+            .build()
+    val response = client.newCall(request).execute()
+    println(">>uploadFile  ${response.body()?.string()} ")
 }
 
 fun main() {
@@ -49,9 +69,11 @@ fun main() {
     listOf("physics", "chemistry", "hindi", "bengali", "geography").forEach { subject ->
         val subjectTaught = SubjectTaught("edds", Batch(12, "D"), subject, "id$subject")
         chapters.forEach { chapter ->
-            upload_create(email, subjectTaught, chapter)
+            val id = upload_create(email, subjectTaught, chapter)
+            println(">>main  Upload done ")
         }
     }
-
-
+    val subjectTaught = SubjectTaught("sds", Batch(12, "A"), "Physics", "physics")
+    val id = upload_create(email, subjectTaught, "Physics")
+    uploadFile(File("C:\\myFiles\\Books\\Packt.Java.9.Data.Structures.and.Algorithms.1785889346.pdf"), id)
 }
