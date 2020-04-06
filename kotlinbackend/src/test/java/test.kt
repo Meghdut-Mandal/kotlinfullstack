@@ -6,7 +6,7 @@ import okhttp3.*
 import java.io.File
 
 
-val parent = "http://localhost:8085"
+val parent = "http://viveeduserv.in"
 val client = OkHttpClient().newBuilder()
         .build()
 
@@ -49,7 +49,7 @@ fun uploadFile(file: File, id: String) {
 
     val countingRequestBody =
             CountingRequestBody(RequestBody.create(MediaType.parse("application/octet-stream"), file)) { bytesWritten, totalLength ->
-                println(">>uploadFile  progress ${(bytesWritten * 100) / totalLength} ")
+                print("\r>>uploadFile  progress ${(bytesWritten * 100) / totalLength} ")
             }
     val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
             .addFormDataPart("abcd", file.absolutePath, countingRequestBody)
@@ -75,5 +75,5 @@ fun main() {
     }
     val subjectTaught = SubjectTaught("sds", Batch(12, "A"), "Physics", "physics")
     val id = upload_create(email, subjectTaught, "Physics")
-    uploadFile(File("C:\\myFiles\\Books\\Packt.Java.9.Data.Structures.and.Algorithms.1785889346.pdf"), id)
+    uploadFile(File("C:\\myFiles\\Books\\Advanced Engineering Mathematics 10th Edition.pdf"), id)
 }

@@ -6,6 +6,7 @@ import dao.NotesDao
 import dao.SubjectTaughtDao
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.LocalFileContent
 import io.ktor.locations.get
 import io.ktor.locations.post
 import io.ktor.request.receive
@@ -16,7 +17,7 @@ import model.Batch
 import model.StringResponse
 import java.io.File
 
-fun Route.student(subjectTaughtDao: SubjectTaughtDao, notesDao: NotesDao) {
+fun Route.student(subjectTaughtDao: SubjectTaughtDao, notesDao: NotesDao, subjectImageDir: File = File("sub_image")) {
 
     post<StudentAPI.Subjects> {
         val batch = call.receive<Batch>()
@@ -28,6 +29,13 @@ fun Route.student(subjectTaughtDao: SubjectTaughtDao, notesDao: NotesDao) {
         val id = it.subject_id
         val notes = notesDao.getNotes(id)
         call.respond(notes)
+    }
+
+    get<StudentAPI.Subjects.Image> {
+        val file = File(subjectImageDir, "${it.slug}.svg")
+        if (file.exists())
+            call.respond(LocalFileContent(file))
+        else call.respond(LocalFileContent(File(subjectImageDir, "default.svg")))
     }
 
 

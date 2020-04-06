@@ -70,7 +70,12 @@ class StudentAPI {
     class Notes(val subject_id: String)
 
     @Location("/subjects/")
-    class Subjects
+    class Subjects {
+
+        @Location("image/{slug}")
+        class Image(val slug: String)
+    }
+
 }
 
 @Location("/notes/{id}/{pageno}")
