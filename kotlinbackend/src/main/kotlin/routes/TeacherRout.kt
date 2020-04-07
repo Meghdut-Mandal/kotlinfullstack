@@ -4,6 +4,7 @@ import ImageConverter
 import TeacherAPI
 import TeacherAPI.SignUpPage
 import com.google.gson.Gson
+import dao.NotesDao
 import dao.SubjectTaughtDao
 import dao.TeacherDao
 import dao.UploadsDao
@@ -35,7 +36,7 @@ import java.io.OutputStream
 
 val stringResponseError = StringResponse(300, "Error in parameters")
 
-fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploadsDao: UploadsDao, subjectTaughtDao: SubjectTaughtDao) {
+fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploadsDao: UploadsDao, subjectTaughtDao: SubjectTaughtDao, notesDao: NotesDao) {
 
     post<TeacherAPI.LogInRequest> {
         val post = call.receive<Parameters>()
@@ -81,8 +82,10 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
     post<TeacherAPI.Uploads> {
         val post = call.receive<Parameters>()
         val id = post["email"] ?: return@post call.respond(stringResponseError)
-        val uploads = uploadsDao.getUploads(id)
-        call.respond(HttpStatusCode.OK, uploads)
+        val teacher = teacherDao.getTeacher(id)
+                ?: return@post call.respond(stringResponseError.copy(message = "Invalid Email"))
+        val notes = teacher.subjects.flatMap { notesDao.getNotes(it) }
+        call.respond(HttpStatusCode.OK, notes)
     }
 
     get<TeacherAPI.Remove> {

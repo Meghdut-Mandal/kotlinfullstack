@@ -73,6 +73,7 @@ class StudentAPI {
     @Location("/subjects/")
     class Subjects {
 
+
         @Location("image/{slug}")
         class Image(val slug: String)
     }
@@ -104,6 +105,7 @@ class TeacherAPI {
 
     @Location("/recent")
     class RecentUploads
+
 
     @Location("/upload/{upload_id}")
     class UploadNotes(val upload_id: String)
@@ -351,7 +353,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
                     Teacher("meghdut.windows@gmail.com", hash("meghdut.windows@gmail.com", "meghdut"),
                             "Meghdut mandal", arrayListOf()))
         }
-        teachers(imageConverter, teacherDao, uploadsDao, subjectsTaughtDao)
+        teachers(imageConverter, teacherDao, uploadsDao, subjectsTaughtDao, notesDao)
         student(subjectsTaughtDao, notesDao)
         static("styles") {
             resources("styles/")
