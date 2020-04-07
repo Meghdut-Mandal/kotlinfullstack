@@ -95,6 +95,16 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
                 ?: return@post call.respond(stringResponseError.copy(message = "Invalid Email"))
         call.respond(teacher.copy(hash = ""))
     }
+    post<TeacherAPI.RecentUploads> {
+        val post = call.receive<Parameters>()
+        val id = post["email"] ?: return@post call.respond(stringResponseError)
+        if (!teacherDao.hasTeacher(id)) {
+            return@post call.respond(stringResponseError.copy(message = "Invalid Email"))
+        } else {
+            val recentUploads = uploadsDao.getRecentUploads(id)
+            call.respond(recentUploads)
+        }
+    }
 
     post<TeacherAPI.UploadID> {
         val post = call.receive<Parameters>()

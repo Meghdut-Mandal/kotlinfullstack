@@ -3,10 +3,19 @@ package dao
 import hash
 import model.Upload
 import org.dizitart.kno2.filters.eq
+import org.dizitart.kno2.filters.text
+import org.dizitart.no2.FindOptions
 import org.dizitart.no2.Nitrite
+import org.dizitart.no2.SortOrder
 import java.io.File
 
 interface UploadsDao {
+    /*
+     get the 10 recent Uploads made by the teacher
+     */
+    fun getRecentUploads(teacherId: String): List<Upload>
+
+
     /*
      update the status of upload of the file
      */
@@ -48,6 +57,11 @@ class UploadDaoImpl(val uploadDb: Nitrite, val parentDir: File = File("uploads")
     override fun updateStatus(uploadId: String, newStatus: String) {
         val upload = getUpload(uploadId)
         repository.update(upload.copy(status = newStatus))
+    }
+
+    override fun getRecentUploads(teacherId: String): List<Upload> {
+        println("dao>UploadDaoImpl>getRecentUploads   ")
+        return repository.find(Upload::teacherID text teacherId, FindOptions.sort("timeStamp", SortOrder.Descending).thenLimit(0, 10)).toList()
     }
 
     override fun hasUpload(uploadId: String): Boolean {

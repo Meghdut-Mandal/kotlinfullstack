@@ -102,6 +102,9 @@ class TeacherAPI {
     @Location("/upload_id/")
     class UploadID
 
+    @Location("/recent")
+    class RecentUploads
+
     @Location("/upload/{upload_id}")
     class UploadNotes(val upload_id: String)
 }

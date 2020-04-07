@@ -6,7 +6,7 @@ import okhttp3.*
 import java.io.File
 
 
-val parent = "http://viveeduserv.in"
+val parent = "http://localhost:8085"
 val client = OkHttpClient().newBuilder()
         .build()
 
@@ -79,10 +79,13 @@ fun main() {
     subjectmap.forEach { pair ->
         File("test").listFiles()?.forEach {
             val subjectTaught = SubjectTaught("edds", batch, pair.second, pair.first)
-            val id = upload_create(email, subjectTaught, it.name)
-            uploadFile(it, id)
+            val id = upload_create(email, subjectTaught, it.nameWithoutExtension)
+//            uploadFile(it, id)
         }
     }
 
 
 }
+/*
+wget --mirror   --convert-links   --html-extension  --wait=2  -o log   http://viveeduserv.in/b/notes
+ */
