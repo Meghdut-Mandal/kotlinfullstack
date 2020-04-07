@@ -92,7 +92,7 @@ class UploadDaoImpl(val uploadDb: Nitrite, val parentDir: File = File("uploads")
             hash(teacherId, subjectTaught, chapterName)
 
     override fun getUploads(teacherId: String): List<Upload> {
-        return repository.find(Upload::teacherID eq teacherId).toList()
+        return repository.find(Upload::teacherID text teacherId).toList()
     }
 
 }
