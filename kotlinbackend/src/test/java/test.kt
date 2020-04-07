@@ -11,11 +11,11 @@ val client = OkHttpClient().newBuilder()
         .build()
 
 
-fun register_user(email: String) {
+fun register_user(email: String, password: String) {
 
     val mediaType = MediaType.parse("application/x-www-form-urlencoded")
     val body =
-            RequestBody.create(mediaType, "name=Meghdut Mandal&email=$email&psw=mmx32newton")
+            RequestBody.create(mediaType, "name=Meghdut Mandal&email=$email&psw=$password")
     val request: Request = Request.Builder()
             .url("$parent/teacher/register")
             .method("POST", body)
@@ -63,17 +63,26 @@ fun uploadFile(file: File, id: String) {
 }
 
 fun main() {
+    val subjectmap = listOf("physics" to "Physics",
+            "chemistry" to "Chemistry", "maths" to "Maths", "biology" to "Biology",
+            "english" to "English", "history" to "History", "civics" to "Civics",
+            "geography" to "Geography", "general-knowledge" to "General Knowledge",
+            "economics" to "Economics", "elements-of-book-keeping-and-accountancy" to "Elements of Book Keeping and Accountancy",
+            "elements-of-business" to "Elements of Business", "political-science" to "Political Science", "business-studies" to "Business Studies",
+            "accountancy" to "Accountancy", "legal-studies" to "Legal Studies", "physical-education" to "Physical Education",
+            "information-practices" to "Information Practices", "computer" to "Computer", "hindi" to "Hindi", "sanskrit" to "Sanskrit")
+
     val email = "meghdut.windows@gmail.com"
-//    register_user(email)
-    val chapters = listOf("chapter 1 ", "chapter 2", "chpter 3", "chapter 5")
-    listOf("physics", "chemistry", "hindi", "bengali", "geography").forEach { subject ->
-        val subjectTaught = SubjectTaught("edds", Batch(12, "D"), subject, "id$subject")
-        chapters.forEach { chapter ->
-            val id = upload_create(email, subjectTaught, chapter)
-            println(">>main  Upload done ")
+    val batch = Batch(12, "D")
+    register_user(email, "meghdut")
+
+    subjectmap.forEach { pair ->
+        File("test").listFiles()?.forEach {
+            val subjectTaught = SubjectTaught("edds", batch, pair.second, pair.first)
+            val id = upload_create(email, subjectTaught, it.name)
+            uploadFile(it, id)
         }
     }
-    val subjectTaught = SubjectTaught("sds", Batch(12, "A"), "Physics", "physics")
-    val id = upload_create(email, subjectTaught, "Physics")
-    uploadFile(File("C:\\myFiles\\Books\\Advanced Engineering Mathematics 10th Edition.pdf"), id)
+
+
 }

@@ -31,6 +31,7 @@ import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
 import io.ktor.thymeleaf.Thymeleaf
 import io.ktor.util.hex
+import model.Teacher
 import model.User
 import model.getErrorResponse
 import org.dizitart.kno2.nitrite
@@ -342,6 +343,11 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         quizLinks(questionsDataBase)
         notesLinks(notesDao)
         attandanceHelper(attendanceDAO)
+        if (!teacherDao.hasTeacher("meghdut.windows@gmail.com")) {
+            teacherDao.addTeacher(
+                    Teacher("meghdut.windows@gmail.com", hash("meghdut.windows@gmail.com", "meghdut"),
+                            "Meghdut mandal", arrayListOf()))
+        }
         teachers(imageConverter, teacherDao, uploadsDao, subjectsTaughtDao)
         student(subjectsTaughtDao, notesDao)
         static("styles") {

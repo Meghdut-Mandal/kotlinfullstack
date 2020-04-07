@@ -14,10 +14,12 @@ class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: N
     private val executor = Executors.newFixedThreadPool(3)
 
     fun processUpload(uploadId: String) = executor.submit {
+        var pdfFile: File? = null
+
         uploadsDao.updateStatus(uploadId, Upload.RECEIVED)
         try {
             val upload = uploadsDao.getUpload(uploadId)
-            val pdfFile = uploadsDao.getUploadFile(uploadId)
+            pdfFile = uploadsDao.getUploadFile(uploadId)
             val outDir = notesDao.getNotesFolder(upload.subjectTaughtID, upload.chapterName)
             outDir.mkdirs()
 
@@ -49,9 +51,12 @@ class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: N
             println(">ImageConverter>processUpload  Converted Images are saved at -> " + "${outDir.absolutePath} ")
             notesDao.addNote(upload.subjectTaughtID, upload.chapterName, numberOfPages)
             uploadsDao.updateStatus(uploadId, Upload.PROCESSED)
+            pdfFile.delete()
         }
         catch (e: Exception) {
+            pdfFile?.delete()
             e.printStackTrace()
+            println(">ImageConverter>processUpload   ")
             uploadsDao.updateStatus(uploadId, Upload.ERROR)
         }
     }

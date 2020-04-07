@@ -30,7 +30,6 @@ fun Route.student(subjectTaughtDao: SubjectTaughtDao, notesDao: NotesDao, subjec
         val notes = notesDao.getNotes(id)
         call.respond(notes)
     }
-
     get<StudentAPI.Subjects.Image> {
         val file = File(subjectImageDir, "${it.slug}.svg")
         if (file.exists())
