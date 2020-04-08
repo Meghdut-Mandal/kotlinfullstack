@@ -11,7 +11,7 @@ import javax.imageio.ImageIO
 
 
 class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: NotesDao) {
-    private val executor = Executors.newCachedThreadPool()
+    private val executor = Executors.newSingleThreadExecutor()
 
     fun processUpload(uploadId: String) = executor.submit {
         var pdfFile: File? = null
@@ -41,7 +41,7 @@ class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: N
                         pdfRenderer.renderImageWithDPI(i, dpi.toFloat(), ImageType.RGB)
                 outPutFile.outputStream().use { fileOutputStream: FileOutputStream ->
                     //                    XZOutputStream(fileOutputStream, LZMA2Options(8)).use { xzStream ->
-                    println(">ImageConverter>processUpload  Writing pdffile image $i $uploadId ")
+                    println(">ImageConverter>processUpload  Writing pdffile image $i $uploadId thread ${Thread.currentThread().name} ")
                     ImageIO.write(bImage, fileExtension, fileOutputStream)
                 }
 
