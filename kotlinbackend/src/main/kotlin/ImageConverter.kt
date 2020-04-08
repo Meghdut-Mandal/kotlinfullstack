@@ -11,7 +11,7 @@ import javax.imageio.ImageIO
 
 
 class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: NotesDao) {
-    private val executor = Executors.newFixedThreadPool(3)
+    private val executor = Executors.newCachedThreadPool()
 
     fun processUpload(uploadId: String) = executor.submit {
         var pdfFile: File? = null
@@ -25,7 +25,6 @@ class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: N
 
             val document: PDDocument = PDDocument.load(pdfFile)
             val pdfRenderer = PDFRenderer(document)
-
             val numberOfPages = document.numberOfPages
             println(">ImageConverter>processUpload  Total files to be converting -> $numberOfPages ")
 //             600 dpi give good image clarity but size of each image is 2x times of 300 dpi.
@@ -35,15 +34,15 @@ class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: N
 
             val dpi = 150
             // use less dpi for to save more space in harddisk. For professional usage you can use more than 300dpi
-            for (i in 0 until numberOfPages) {
+            (0 until numberOfPages).toList().parallelStream().forEach { i ->
                 val outPutFile =
                         File(outDir, "p$i.$fileExtension")
                 val bImage =
                         pdfRenderer.renderImageWithDPI(i, dpi.toFloat(), ImageType.RGB)
                 outPutFile.outputStream().use { fileOutputStream: FileOutputStream ->
                     //                    XZOutputStream(fileOutputStream, LZMA2Options(8)).use { xzStream ->
+                    println(">ImageConverter>processUpload  Writing pdffile image $i $uploadId ")
                     ImageIO.write(bImage, fileExtension, fileOutputStream)
-//                    }
                 }
 
             }

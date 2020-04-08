@@ -7,7 +7,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 
-val parent = "http://viveeduserv.in"
+val parent = "http://localhost:8085"
 val client = OkHttpClient().newBuilder().readTimeout(1, TimeUnit.MINUTES)
         .build()
 
@@ -78,10 +78,15 @@ fun main() {
     register_user(email, "meghdut")
 
     subjectmap.forEach { pair ->
-        File("test").listFiles()?.forEach {
-            val subjectTaught = SubjectTaught("edds", batch, pair.second, pair.first)
-            val id = upload_create(email, subjectTaught, it.nameWithoutExtension)
-            uploadFile(it, id)
+        File("test").listFiles()?.toList()!!.parallelStream().forEach {
+            try {
+                val subjectTaught = SubjectTaught("edds", batch, pair.second, pair.first)
+                val id = upload_create(email, subjectTaught, it.nameWithoutExtension)
+                uploadFile(it, id)
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

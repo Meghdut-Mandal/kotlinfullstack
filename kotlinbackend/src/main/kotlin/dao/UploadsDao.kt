@@ -61,7 +61,7 @@ class UploadDaoImpl(val uploadDb: Nitrite, val parentDir: File = File("uploads")
 
     override fun getRecentUploads(teacherId: String): List<Upload> {
         println("dao>UploadDaoImpl>getRecentUploads   ")
-        return repository.find(Upload::teacherID text teacherId, FindOptions.sort("timeStamp", SortOrder.Descending).thenLimit(0, 10)).toList()
+        return repository.find(FindOptions.sort("timeStamp", SortOrder.Descending)).filter { it.teacherID == teacherId }.take(10).toList()
     }
 
     override fun hasUpload(uploadId: String): Boolean {
