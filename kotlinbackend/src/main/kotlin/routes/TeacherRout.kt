@@ -59,6 +59,7 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
     get<SignUpPage> {
         call.respond(ThymeleafContent("teacher_signup", mapOf()))
     }
+
     post<SignUpPage> {
         val post = call.receive<Parameters>()
         val userName = post["name"]

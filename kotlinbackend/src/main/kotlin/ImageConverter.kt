@@ -11,7 +11,7 @@ import javax.imageio.ImageIO
 
 
 class ImageConverter(private val uploadsDao: UploadsDao, private val notesDao: NotesDao) {
-    private val executor = Executors.newSingleThreadExecutor()
+    private val executor = Executors.newFixedThreadPool(2)
 
     fun processUpload(uploadId: String) = executor.submit {
         var pdfFile: File? = null
