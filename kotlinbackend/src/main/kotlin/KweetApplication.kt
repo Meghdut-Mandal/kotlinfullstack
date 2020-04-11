@@ -100,6 +100,9 @@ class TeacherAPI {
     @Location("/uploads/")
     class Uploads
 
+    @Location("start/{upload_id}")
+    class StartConversion(val upload_id: String)
+
     @Location("/upload_id/")
     class UploadID
 

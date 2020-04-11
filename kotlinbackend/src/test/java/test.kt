@@ -53,34 +53,25 @@ fun uploadFile(file: File, id: String) {
                 print("\r>>uploadFile  progress ${(bytesWritten * 100) / totalLength} ")
             }
     val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
-            .addFormDataPart("abcd", file.absolutePath, countingRequestBody)
+            .addFormDataPart("uploadFile", file.absolutePath, countingRequestBody)
+            .addFormDataPart("uploadid",id)
             .build()
     val request: Request = Request.Builder()
-            .url("$parent/teacher/upload/$id")
+            .url("http://localhost:8080/upload")
             .method("POST", body)
             .build()
     val response = client.newCall(request).execute()
     println(">>uploadFile  ${response.body()?.string()} ")
 }
 
-fun main() {
-    val subjectmap = listOf("physics" to "Physics",
-            "chemistry" to "Chemistry", "maths" to "Maths", "biology" to "Biology",
-            "english" to "English", "history" to "History", "civics" to "Civics",
-            "geography" to "Geography", "general-knowledge" to "General Knowledge",
-            "economics" to "Economics", "elements-of-book-keeping-and-accountancy" to "Elements of Book Keeping and Accountancy",
-            "elements-of-business" to "Elements of Business", "political-science" to "Political Science", "business-studies" to "Business Studies",
-            "accountancy" to "Accountancy", "legal-studies" to "Legal Studies", "physical-education" to "Physical Education",
-            "information-practices" to "Information Practices", "computer" to "Computer", "hindi" to "Hindi", "sanskrit" to "Sanskrit")
-
-    val email = "meghdut.windows@gmail.com"
-    val batch = Batch(12, "D")
-    register_user(email, "meghdut")
+fun allFilesTest() {
+    val subjectmap = getSubjects()
+    val (email, batch) = register()
 
     subjectmap.forEach { pair ->
         File("test").listFiles()?.toList()!!.parallelStream().forEach {
             try {
-                val subjectTaught = SubjectTaught("edds", batch, pair.second, pair.first)
+                val subjectTaught = SubjectTaught("edds"+Math.random(), batch, pair.second, pair.first)
                 val id = upload_create(email, subjectTaught, it.nameWithoutExtension)
                 uploadFile(it, id)
             }
@@ -89,9 +80,34 @@ fun main() {
             }
         }
     }
-
-
 }
-/*
-wget --mirror   --convert-links   --html-extension  --wait=2  -o log   http://viveeduserv.in/b/notes
- */
+
+private fun register(): Pair<String, Batch> {
+    val email = "meghdut.windows@gmail.com"
+    val batch = Batch(12, "D")
+    register_user(email, "meghdut")
+    return Pair(email, batch)
+}
+
+fun singleFileTest() {
+    val (email, batch) = register()
+    val subjectTaught = SubjectTaught("edds"+Math.random(), batch, "Hola", "hola")
+    val file=File("test").listFiles()?.first()
+    val id = upload_create(email, subjectTaught,file?.name!!)
+    uploadFile(file, id)
+}
+
+private fun getSubjects(): List<Pair<String, String>> {
+    return listOf("physics" to "Physics",
+            "chemistry" to "Chemistry", "maths" to "Maths", "biology" to "Biology",
+            "english" to "English", "history" to "History", "civics" to "Civics",
+            "geography" to "Geography", "general-knowledge" to "General Knowledge",
+            "economics" to "Economics", "elements-of-book-keeping-and-accountancy" to "Elements of Book Keeping and Accountancy",
+            "elements-of-business" to "Elements of Business", "political-science" to "Political Science", "business-studies" to "Business Studies",
+            "accountancy" to "Accountancy", "legal-studies" to "Legal Studies", "physical-education" to "Physical Education",
+            "information-practices" to "Information Practices", "computer" to "Computer", "hindi" to "Hindi", "sanskrit" to "Sanskrit")
+}
+
+fun main() {
+    singleFileTest()
+}
