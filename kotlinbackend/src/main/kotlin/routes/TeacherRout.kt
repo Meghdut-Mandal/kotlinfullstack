@@ -158,9 +158,9 @@ fun Route.teachers(imageConverter: ImageConverter, teacherDao: TeacherDao, uploa
                 part.streamProvider().use { its ->
                     println("routes>>teachers  stream file started  ")
                     // copy the stream to the file with buffering
-                    call.respond(StringResponse(200, "Successfully uploaded "))
                     file.outputStream().buffered().use {
                         // note that this is blocking
+                        call.respond(StringResponse(200, "Successfully uploaded "))
                         its.copyTo(it)
                         println("routes>>teachers stream complete ")
                         uploadsDao.updateStatus(uploadId, Upload.RECEIVED)

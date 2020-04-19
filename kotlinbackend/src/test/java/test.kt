@@ -3,18 +3,19 @@ import model.Batch
 import model.StringResponse
 import model.SubjectTaught
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.File
 import java.util.concurrent.TimeUnit
 
 
-val parent = "http://localhost:8085"
+val parent ="http://localhost:8085"
 val client = OkHttpClient().newBuilder().readTimeout(1, TimeUnit.MINUTES)
         .build()
 
 
 fun register_user(email: String, password: String) {
 
-    val mediaType = MediaType.parse("application/x-www-form-urlencoded")
+    val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
     val body =
             RequestBody.create(mediaType, "name=Meghdut Mandal&email=$email&psw=$password")
     val request: Request = Request.Builder()
@@ -24,7 +25,7 @@ fun register_user(email: String, password: String) {
             .build()
     val response: Response = client.newCall(request).execute()
 
-    val string = response.body()?.string()
+    val string = response.body?.string()
     if (string!!.contains("Registration Completed"))
         println(">>register_user  Sucess ")
     else println(">>register_user  Not sucessfull ")
@@ -42,14 +43,14 @@ fun upload_create(email: String, subjectTaught: SubjectTaught, chapterName: Stri
             .addHeader("Content-Type", "multipart/form-data;")
             .build()
     val response = client.newCall(request).execute()
-    val fromJson = Gson().fromJson(response.body()?.string(), StringResponse::class.java)
+    val fromJson = Gson().fromJson(response.body?.string(), StringResponse::class.java)
     return fromJson.message
 }
 
 fun uploadFile(file: File, id: String) {
 
     val countingRequestBody =
-            CountingRequestBody(RequestBody.create(MediaType.parse("application/octet-stream"), file)) { bytesWritten, totalLength ->
+            CountingRequestBody(RequestBody.create("application/octet-stream".toMediaTypeOrNull(), file)) { bytesWritten, totalLength ->
                 print("\r>>uploadFile  progress ${(bytesWritten * 100) / totalLength} ")
             }
     val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -61,7 +62,7 @@ fun uploadFile(file: File, id: String) {
             .method("POST", body)
             .build()
     val response = client.newCall(request).execute()
-    println(">>uploadFile  ${response.body()?.string()} ")
+    println(">>uploadFile  ${response.body?.string()} ")
 }
 
 fun allFilesTest() {

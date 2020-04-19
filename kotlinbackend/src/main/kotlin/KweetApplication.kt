@@ -1,10 +1,7 @@
 import com.google.gson.Gson
 import dao.*
 import freemarker.cache.ClassTemplateLoader
-import io.ktor.application.Application
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.application.install
+import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
@@ -36,6 +33,7 @@ import model.User
 import model.getErrorResponse
 import org.dizitart.kno2.nitrite
 import org.dizitart.no2.Nitrite
+import org.slf4j.event.Level
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import routes.*
 import java.io.File
@@ -60,7 +58,7 @@ class Index
 @Location("/boot")
 class BootRequest
 
-@Location("/school/notices/delete")
+@Location("/school/notices/routes.delete")
 class DeleteNotices
 
 
@@ -115,7 +113,7 @@ class TeacherAPI {
 }
 
 
-@Location("/kweet/{id}/delete")
+@Location("/kweet/{id}/routes.delete")
 class KweetDelete(val id: Int)
 
 @Location("/view_kweet/{id}")
@@ -277,8 +275,9 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         maxAge = Duration.ofDays(1)
         header("key")
     }
-    install(CallLogging)
-
+    install(CallLogging) {
+        level = Level.INFO
+    }
 //    println(">>mainWithDependencies   ")
     install(DefaultHeaders)
 
@@ -330,6 +329,17 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         }
     }
 
+    install(SinglePageApplication) {
+        // main page file name to be served
+        defaultPage = "index.html"
+        spaRoute = "/web"
+        // folder in which look for you spa files, either
+        // inside bundled resources or current working directory
+        folderPath = "react/"
+        useFiles = true
+
+    }
+
 
     // Provides a hash function to be used when registering the resources.
     val hashFunction = { s: String -> hash(s) }
@@ -343,6 +353,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
 //        postNew(dao, hashFunction)
         delete(dao, hashFunction)
         userPage(dao)
+
         viewKweet(dao, hashFunction)
         login(dao, hashFunction)
         register(dao, hashFunction)
@@ -351,6 +362,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         quizLinks(questionsDataBase)
         notesLinks(notesDao)
         attandanceHelper(attendanceDAO)
+        carrerLibrary(dao, hashFunction)
         if (!teacherDao.hasTeacher("meghdut.windows@gmail.com")) {
             teacherDao.addTeacher(
                     Teacher("meghdut.windows@gmail.com", hash("meghdut.windows@gmail.com", "meghdut"),
@@ -368,9 +380,6 @@ fun Application.mainWithDependencies(dao: ViveDao) {
             resources("templates/sample_site")
             resource("/home", "templates/sample_site/home.html")
         }
-
-
-        carrerLibrary(dao, hashFunction)
     }
 }
 
