@@ -132,6 +132,10 @@ data class Register(val userId: String = "", val displayName: String = "", val e
 @Location("/login")
 data class Login(val userId: String = "", val error: String = "")
 
+
+@Location("/nptel")
+data class NptelData(val skip: Long = 0, val limit: Long = 20)
+
 @Location("/logout")
 class Logout
 
@@ -358,6 +362,7 @@ fun Application.mainWithDependencies(dao: ViveDao) {
         login(dao, hashFunction)
         register(dao, hashFunction)
         notices(dao, hashFunction)
+        nptel()
         schoolList(schoolsDao)
         quizLinks(questionsDataBase)
         notesLinks(notesDao)
